@@ -33,7 +33,7 @@ wac_data = read_csv("CleanData/WAC_clean.csv", col_types = cols(GEOID = col_char
 #Prepare Data for Gentrification Encoding
 
 ```{r}
-prepared_data = acs_data %>% 
+input_data = acs_data %>% 
   group_by(GEOID) %>%
   mutate(diff_p_college_pop = lead(p_college_pop, order_by = year) - p_college_pop) %>% 
   ungroup() %>%
@@ -45,6 +45,19 @@ prepared_data = acs_data %>%
 
 #Encode Gentrification
 
-##Encode 
+```{r}
+input_data %>%
+  filter(ifelse(medianincome <= median(medianincome), 1, 0) == 1) %>%
+  mutate(edugentrify = case_when(diff_p_college_pop <= median(diff_p_college_pop) ~ 0,
+                                 diff_p_college_pop >= quantile(diff_p_college_pop, probs = .75) ~ 1)) %>%
+  filter(!is.na(edugentrify)) %>%
+  filter(ifelse(pre_p_college_pop >= quantile(pre_p_college_pop, probs = .75), 1, 0) == 0) %>%
+  group_by(edugentrify) %>%
+  summarize(mean = mean(pre_p_college_pop))
+```
+
+
+
+
 
 

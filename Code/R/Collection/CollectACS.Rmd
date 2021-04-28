@@ -15,18 +15,13 @@ knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrificati
 ```{r}
 #Load Packages
 library(magrittr)
-library(lehdr)
+library(readr)
 library(readxl)
 library(tidycensus)
 library(tidyverse)
 ```
 
 #List Variables to Import
-```{r}
-v17 <- load_variables(2010, "acs5", cache = TRUE)
-
-View(v17)
-```
 
 ##2010 
 

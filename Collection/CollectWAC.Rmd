@@ -1,0 +1,51 @@
+---
+title: "Collect WAC Data"
+author: "Liam Purkey"
+date: "4/27/2021"
+output: html_document
+---
+
+#Setup Document 
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load Packages
+library(magrittr)
+library(lehdr)
+library(readxl)
+library(readr)
+library(tidyverse)
+```
+
+```{r}
+#Read in raw data
+nyc_tracts = read_excel("RawData/nyc_tracts.xlsx", sheet = "tract_to_NTA") %>%
+  select(-County, -Tract)
+```
+
+#Use lehdr Package to Collect LODES Data
+
+```{r}
+#Iteratively read in data over study years (2009-2018) and save to WAC folder in RawData
+for (year in 2009:2018) {
+  
+  #Collect data
+  data = grab_lodes(state = "ny", year = year, lodes_type = "wac", job_type = "JT03", segment = "S000", agg_geo = "tract") %>%
+    rename(GEOID = w_tract) %>%
+    inner_join(nyc_tracts, by = "GEOID")
+  
+  #Create file path with WAC_year.csv format
+  file_path = paste("RawData/WAC", paste(paste("WAC", year, sep = "_"), "csv", sep = "."), sep = "/") 
+  
+  #Write data
+  write_csv(data, file_path)
+  
+}
+```
+
+
+

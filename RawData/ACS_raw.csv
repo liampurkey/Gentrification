@@ -1,4 +1,4 @@
-GEOID,asian,black,college_pop,hispanic,housing_pop,hs_pop,lesshs_pop,medianhomevalue,medianincome,medianrent,pop,poverty,renter_occupied,white,year
+GEOID,asian_pop,black_pop,college_pop,hispanic_pop,housing_pop,hs_pop,lesshs_pop,medianhomevalue,medianincome,medianrent,pop,poverty_pop,renter_pop,white_pop,year
 36005000100,207,6107,119,3595,0,1028,4875,NA,NA,NA,10453,0,0,1474,2011
 36005000200,160,1414,418,3064,4394,544,337,422900,63449,1278,4403,846,1973,727,2011
 36005000400,149,1362,881,3389,5004,813,326,377900,75729,1419,5017,491,1564,614,2011

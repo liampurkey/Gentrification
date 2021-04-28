@@ -23,7 +23,7 @@ library(tidyverse)
 
 ```{r}
 #Read in raw data
-nyc_tracts = read_excel("RawData/nyc_tracts.xlsx", sheet = "tract_to_NTA") %>%
+nyc_tracts = read_excel("RawData/nyc_tracts.xlsx", sheet = "tract_to_NTA", col_types = "text") %>%
   select(-County, -Tract)
 ```
 

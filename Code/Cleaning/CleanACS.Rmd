@@ -1,0 +1,45 @@
+---
+title: "Clean ACS Data"
+author: "Liam Purkey"
+date: "4/28/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load Packages
+library(magrittr)
+library(readr)
+library(readxl)
+library(tidycensus)
+library(tidyverse)
+source("Code/Scripts/utils.R")
+```
+
+```{r}
+#Read in data to clean
+acs_raw = read_csv("RawData/ACS_raw.csv", col_types = cols(GEOID = col_character())) 
+```
+
+```{r}
+acs_clean = acs_raw %>%
+  group_by(GEOID) %>%
+  filter(sum(ifelse((is.na(medianincome) | is.nan(medianincome) | is.infinite(medianincome))  & year == 2011, 1, 0)) == 0) %>% #Drop observations with missing median income data in 2011
+  filter(sum(ifelse(is.na(college_pop) | is.nan(college_pop) | is.infinite(college_pop), 1, 0)) == 0) %>% #Drop observations with missing college data in 2011 or 2018
+  ungroup() %>%
+  mutate(across(ends_with("_pop"), ~.x/pop, .names = "p_{.col}")) %>% #Transform data to shares of population 
+  select(-(ends_with("_pop") & !starts_with("p_"))) #Drop raw population counts
+```
+
+#Write Clean ACS Data
+
+```{r}
+write_csv(acs_clean, "CleanData/ACS_clean.csv")
+```
+

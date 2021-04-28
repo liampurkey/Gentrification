@@ -27,16 +27,16 @@ library(tidyverse)
 
 ```{r}
 #Race variables
-race_2011 = c(pop = "B01003_001", white = "B02001_002", black = "B02001_003", asian = "B02001_005", hispanic = "B03001_003")
+race_2011 = c(pop = "B01003_001", white_pop = "B02001_002", black_pop = "B02001_003", asian_pop = "B02001_005", hispanic_pop = "B03001_003")
 
 #Education variables 
 education_2011 = c(lesshs_pop = "B23006_002", hs_pop = "B23006_009", college_pop = "B23006_023")
 
 #Housing variables 
-housing_2011 = c(medianrent = "B25064_001", medianhomevalue = "B25077_001", housing_pop = "B25026_001", renter_occupied = "B25026_009")
+housing_2011 = c(medianrent = "B25064_001", medianhomevalue = "B25077_001", housing_pop = "B25026_001", renter_pop = "B25026_009")
 
 #Poverty variables 
-poverty_2011 = c(poverty = "B17001_002")
+poverty_2011 = c(poverty_pop = "B17001_002")
 
 #Income variables 
 income_2011 = c(medianincome = "B19013_001")
@@ -48,16 +48,16 @@ variables_2011 = c(race_2011, education_2011, housing_2011, poverty_2011, income
 
 ```{r}
 #Race variables
-race_2018 = c(pop = "B01003_001", white = "B02001_002", black = "B02001_003", asian = "B02001_005", hispanic = "B03001_003")
+race_2018 = c(pop = "B01003_001", white_pop = "B02001_002", black_pop = "B02001_003", asian_pop = "B02001_005", hispanic_pop = "B03001_003")
 
 #Education variables
 education_2018 = c(lesshs_pop = "B23006_002", hs_pop = "B23006_009", college_pop = "B23006_023")
 
 #Housing variables
-housing_2018 = c(medianrent = "B25064_001", medianhomevalue = "B25077_001", housing_pop = "B25026_001", renter_occupied = "B25026_009")
+housing_2018 = c(medianrent = "B25064_001", medianhomevalue = "B25077_001", housing_pop = "B25026_001", renter_pop = "B25026_009")
 
 #Poverty variables
-poverty_2018 = c(poverty = "B17001_002")
+poverty_2018 = c(poverty_pop = "B17001_002")
 
 #Income variables
 income_2018 = c(medianincome = "B19013_001")

@@ -24,7 +24,7 @@ library(spData)
 library(tmap)
 library(tidycensus)
 library(tidyverse)
-source("Code/R/Scripts/utils.R")
+source("Code/Scripts/utils.R")
 ```
 
 #Collect New York City Census Tract Shapefile

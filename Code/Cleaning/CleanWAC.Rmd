@@ -20,7 +20,7 @@ library(readr)
 library(tidyverse)
 library(sf)
 library(spData)
-source("Code/R/Scripts/utils.R")
+source("Code/Scripts/utils.R")
 ```
 
 ```{r}
@@ -34,8 +34,7 @@ nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
 for (year in 2009:2018) {
   
   file_path = paste("RawData/WAC", paste(paste("WAC", year, sep = "_"), "csv", sep = "."), sep = "/")
-  data = read_csv(file_path) %>%
-    mutate(GEOID = as.character(GEOID))
+  data = read_csv(file_path, col_types = cols(GEOID = col_character())) 
   
   if (year == 2009) {
     wac_raw = data 
@@ -74,5 +73,6 @@ wac_clean = wac_raw %>%
 ```{r}
 write_csv(wac_clean, "CleanData/WAC_clean.csv")
 ```
+
 
 

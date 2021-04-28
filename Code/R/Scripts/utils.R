@@ -50,11 +50,11 @@ normalize = function(data, variables, total, prefix = NULL, drop = FALSE) {
 
 ##Spatial Functions
 
-st_erase <- function(x, y) {
+st.erase <- function(x, y) {
   sf::st_difference(x, sf::st_union(y))
 }
 
-clean_units <- function(x){
+clean.units <- function(x){
   attr(x,"units") <- NULL
   class(x) <- setdiff(class(x),"units")
   x

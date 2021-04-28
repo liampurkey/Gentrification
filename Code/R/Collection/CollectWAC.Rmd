@@ -36,6 +36,7 @@ for (year in 2009:2018) {
   #Collect data
   data = grab_lodes(state = "ny", year = year, lodes_type = "wac", job_type = "JT03", segment = "S000", agg_geo = "tract") %>%
     rename(GEOID = w_tract) %>%
+    select(-state) %>%
     inner_join(nyc_tracts, by = "GEOID")
   
   #Create file path with WAC_year.csv format

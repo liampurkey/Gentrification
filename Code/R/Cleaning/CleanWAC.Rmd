@@ -1,0 +1,46 @@
+---
+title: "Clean WAC Data"
+author: "Liam Purkey"
+date: "4/27/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load packages
+library(magrittr)
+library(readxl)
+library(readr)
+library(tidyverse)
+source("Code/R/Scripts/utils.R")
+```
+
+```{r}
+#Read in raw WAC data  
+for (year in 2009:2018) {
+  
+  file_path = paste("RawData/WAC", paste(paste("WAC", year, sep = "_"), "csv", sep = "."), sep = "/")
+  data = read_csv(file_path)
+  
+  if (year == 2009) {
+    wac_data = data 
+  } else {
+    wac_data = bind_rows(wac_data, data)
+  }
+  
+}
+```
+
+#Clean WAC Data
+
+```{r}
+wac_data %>%
+  select(c(year, GEOID, C000))
+```
+

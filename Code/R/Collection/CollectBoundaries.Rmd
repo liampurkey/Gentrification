@@ -40,7 +40,7 @@ nyc_water = area_water(state = "NY", county = c("Bronx", "Kings", "New York", "Q
 ```
 
 ```{r}
-nyc_geo = st_erase(nyc_tracts, nyc_water)
+nyc_geo = st.erase(nyc_tracts, nyc_water)
 ```
 
 #Write Data

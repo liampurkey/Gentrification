@@ -22,6 +22,7 @@ options(tigris_use_cache = TRUE)
 library(sf)
 library(spData)
 library(tmap)
+library(tidycensus)
 library(tidyverse)
 source("Code/R/Scripts/utils.R")
 ```
@@ -41,6 +42,12 @@ nyc_water = area_water(state = "NY", county = c("Bronx", "Kings", "New York", "Q
 
 ```{r}
 nyc_geo = st.erase(nyc_tracts, nyc_water)
+```
+
+#Add Census Tract Area Variable
+
+```{r}
+nyc_geo = cbind(nyc_geo, tract_area = clean.units(st_area(nyc_geo))*3.86102e-7)
 ```
 
 #Write Data

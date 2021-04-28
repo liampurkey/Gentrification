@@ -34,7 +34,7 @@ nyc_tracts = read_excel("RawData/nyc_tracts.xlsx", sheet = "tract_to_NTA") %>%
 for (year in 2009:2018) {
   
   #Collect data
-  data = grab_lodes(state = "ny", year = year, lodes_type = "wac", job_type = "JT03", segment = "S000", agg_geo = "tract") %>%
+  data = grab_lodes(state = "ny", year = year, lodes_type = "wac", job_type = "JT02", segment = "S000", agg_geo = "tract") %>%
     rename(GEOID = w_tract) %>%
     select(-state) %>%
     inner_join(nyc_tracts, by = "GEOID")

@@ -17,6 +17,7 @@ knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrificati
 library(magrittr)
 library(readr)
 library(readxl)
+library(Ckmeans.1d.dp)
 library(tidycensus)
 library(tidyverse)
 source("Code/Scripts/utils.R")
@@ -24,13 +25,26 @@ source("Code/Scripts/utils.R")
 
 ```{r}
 #Read in data used to create gentrification indicator
-prepared_data = read_csv("CleanData/ACS_clean.csv", col_types = cols(GEOID = col_character())) %>%
-  group_by(GEOID) %>%
-  mutate()
+acs_data = read_csv("CleanData/ACS_clean.csv", col_types = cols(GEOID = col_character())) 
+ltdb_data = read_csv("CleanData/LTDB_clean.csv", col_types = cols(GEOID = col_character()))
+wac_data = read_csv("CleanData/WAC_clean.csv", col_types = cols(GEOID = col_character()))
 ```
 
 #Prepare Data for Gentrification Encoding
 
+```{r}
+prepared_data = acs_data %>% 
+  group_by(GEOID) %>%
+  mutate(diff_p_college_pop = lead(p_college_pop, order_by = year) - p_college_pop) %>% 
+  ungroup() %>%
+  filter(year == 2011) %>%
+  inner_join(ltdb_data, by = "GEOID") %>% 
+  mutate(pre_p_college_pop = p_college_pop - p_college_pop_2000) %>%
+  select(GEOID, medianincome, diff_p_college_pop, pre_p_college_pop)
+```
 
+#Encode Gentrification
+
+##Encode 
 
 

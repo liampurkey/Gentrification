@@ -38,8 +38,17 @@ ltdb_raw = read_excel("RawData/ltdb_dp.xlsx", sheet = "LTDB_DP data") %>%
 #Clean Data
 
 ```{r}
-ltdb_raw %>%
+ltdb_clean = ltdb_raw %>%
   rename(GEOID = trtid10) %>%
-  inner_join(nyc_tracts, by = "GEOID")
+  inner_join(nyc_tracts, by = "GEOID") %>%
+  mutate(p_college_pop_2000 = coll4yr / total) %>%
+  select(-total, -coll4yr)
 ```
+
+#Write Data
+
+```{r}
+write_csv(ltdb_clean, "CleanData/LTDB_clean.csv")
+```
+
 

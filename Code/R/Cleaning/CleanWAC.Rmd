@@ -41,6 +41,11 @@ for (year in 2009:2018) {
 
 ```{r}
 wac_data %>%
-  select(c(year, GEOID, C000))
+  select(year, GEOID, Borough, NTA, C000, CNS05, CNS06, CNS07, CNS08, CNS09, CNS10, CNS11, CNS12, CNS13, CNS14, CNS15, CNS16, CNS17, CNS18, CNS19, #Industry
+         CR01, CR02, CR04, CT02, #Race 
+         CFA01, CFA02, CFA03, CFA04, CFA05) %>% #Firm Age
+  rename(w_total = C000, w_manufacturing = CNS05, w_trade = CNS06, w_retail = CNS07, w_storage = CNS08, 
+         w_information = CNS09, w_finance = CNS10, w_realestate = CNS11, w_professional = CNS12, w_management = CNS13,
+         w_administrative = CNS14)
 ```
 

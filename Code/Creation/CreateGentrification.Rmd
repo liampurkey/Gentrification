@@ -1,0 +1,36 @@
+---
+title: "Create Gentrification Indicator"
+author: "Liam Purkey"
+date: "4/28/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load Packages
+library(magrittr)
+library(readr)
+library(readxl)
+library(tidycensus)
+library(tidyverse)
+source("Code/Scripts/utils.R")
+```
+
+```{r}
+#Read in data used to create gentrification indicator
+prepared_data = read_csv("CleanData/ACS_clean.csv", col_types = cols(GEOID = col_character())) %>%
+  group_by(GEOID) %>%
+  mutate()
+```
+
+#Prepare Data for Gentrification Encoding
+
+
+
+

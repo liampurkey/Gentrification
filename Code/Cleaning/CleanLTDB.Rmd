@@ -1,0 +1,45 @@
+---
+title: "Clean LTDB Data"
+author: "Liam Purkey"
+date: "4/28/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load Packages
+library(magrittr)
+library(readr)
+library(readxl)
+library(tidycensus)
+library(tidyverse)
+source("Code/Scripts/utils.R")
+```
+
+```{r}
+#Read in New York City tracts
+nyc_tracts = read_excel("RawData/nyc_tracts.xlsx", col_types = "text") %>%
+  select(-County, -Tract)
+```
+
+```{r}
+#Read in data to clean
+ltdb_raw = read_excel("RawData/ltdb_dp.xlsx", sheet = "LTDB_DP data") %>%
+  select(trtid10, total, coll4yr) %>%
+  mutate(trtid10 = as.character(trtid10))
+```
+
+#Clean Data
+
+```{r}
+ltdb_raw %>%
+  rename(GEOID = trtid10) %>%
+  inner_join(nyc_tracts, by = "GEOID")
+```
+

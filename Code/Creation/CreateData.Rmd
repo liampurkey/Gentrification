@@ -30,7 +30,9 @@ ltdb_data = read_csv("CleanData/LTDB_clean.csv", col_types = cols(GEOID = col_ch
 wac_data = read_csv("CleanData/WAC_clean.csv", col_types = cols(GEOID = col_character()))
 ```
 
-#Prepare Data for Gentrification Encoding
+#Encode Gentrification
+
+##Prepare Data for Gentrification Encoding
 
 ```{r}
 input_data = acs_data %>% 
@@ -43,14 +45,44 @@ input_data = acs_data %>%
   select(GEOID, medianincome, diff_p_college_pop, pre_p_college_pop)
 ```
 
-#Encode Gentrification
+##Encode Gentrification given Inputs
 
 ```{r}
 gen_data = create.gentrification(income_var = "medianincome", college_var = "diff_p_college_pop", pre_var = "pre_p_college_pop",
-                                 income_pctile = .5, college_pctile_lower = .5, college_pctile_upper = .75, pre_pctile = .75, data = input_data)
+                                 income_pctile = .5, college_pctile_lower = .5, college_pctile_upper = .75, pre_pctile = .75, data = input_data) %>%
+  select(GEOID, gentrify)
 ```
 
+#Create Main Datasets
 
+##Create DD Data
+
+```{r}
+dd_data = wac_data %>%
+  filter(year == 2011 | year == 2018) %>%
+  inner_join(gen_data, by = "GEOID") %>%
+  inner_join(acs_data %>% filter(year == 2011) %>% select(-year), by = "GEOID")
+```
+
+##Create Event Study Data
+
+```{r}
+es_data = wac_data %>%
+  inner_join(gen_data, by = "GEOID") %>%
+  mutate(gentrify = ifelse(year <= 2011, 0, gentrify)) 
+```
+
+##Create Summary Statistics Data
+
+```{r}
+summary_data = acs_data %>%
+  inner_join(gen_data, by = "GEOID") %>%
+  inner_join(wac_data, by = c("GEOID", "year")) %>%
+  group_by(GEOID) %>%
+  mutate(across(starts_with("p_"), ~lead(.x, order_by = year) - .x, .names = "diff_{.col}")) %>%
+  mutate(across(starts_with("d_"), ~(lead(.x, order_by = year) - .x)/.x, .names = "pc_{.col}")) %>%
+  mutate(across(c(medianhomevalue, medianincome, medianrent, pop), ~(lead(.x, order_by = year) - .x)/.x, .names = "pc_{.col}"))
+```
 
 
 

@@ -49,8 +49,8 @@ input_data = acs_data %>%
 
 ```{r}
 gen_data = create.gentrification(income_var = "medianincome", college_var = "diff_p_college_pop", pre_var = "pre_p_college_pop",
-                                 income_pctile = .5, college_pctile_lower = .5, college_pctile_upper = .75, pre_pctile = .75, data = input_data) %>%
-  select(GEOID, gentrify)
+                                 income_pctile = .5, college_pctile_lower = .5, college_pctile_upper = .75, pre_pctile = .9, data = input_data) %>%
+  select(GEOID, gentrify, pre_p_college_pop)
 ```
 
 #Create Main Datasets

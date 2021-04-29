@@ -1,0 +1,56 @@
+---
+title: "Create Gentrification Map"
+author: "Liam Purkey"
+date: "4/29/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load packages
+library(magrittr)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(sf)
+library(spData)
+library(tmap)
+source("Code/Scripts/utils.R")
+```
+
+```{r}
+#Read in and format shapefile
+map_data = st_read("RawData/Boundaries/NewYork.shp") %>%
+  left_join(read_csv("CleanData/Main/summary_data.csv", col_types = cols(GEOID = col_character())) %>% select(GEOID, gentrify), by = "GEOID") %>%
+  mutate(gentrify = case_when(gentrify == 0 ~ 1,
+                              gentrify == 1 ~ 0,
+                              is.na(gentrify) ~ 2))
+```
+
+#Create Map of Spatial Distribution of Gentrification
+
+```{r}
+nyc_map = tm_shape(map_data) + tm_polygons("gentrify", style = "cat", palette = c("red4", "#FDBEB9", "#DEEBF7"),
+                                labels = c("Gentrifying", "Not Gentrifying", "Not in Sample"),
+                                title = "Legend") + 
+                    tm_layout(legend.outside = TRUE, legend.text.size = .8, legend.title.size = 1, fontfamily = "Palatino", frame = FALSE,
+                              asp = 1)
+```
+
+#Write Map
+
+```{r}
+tmap_save(tm = nyc_map, filename = "Results/Summary/Plots/gentrification_map.png")
+```
+
+
+
+
+
+

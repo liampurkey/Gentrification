@@ -81,7 +81,17 @@ summary_data = acs_data %>%
   group_by(GEOID) %>%
   mutate(across(starts_with("p_"), ~lead(.x, order_by = year) - .x, .names = "diff_{.col}")) %>%
   mutate(across(starts_with("d_"), ~(lead(.x, order_by = year) - .x)/.x, .names = "pc_{.col}")) %>%
-  mutate(across(c(medianhomevalue, medianincome, medianrent, pop), ~(lead(.x, order_by = year) - .x)/.x, .names = "pc_{.col}"))
+  mutate(across(c(medianhomevalue, medianincome, medianrent, pop), ~(lead(.x, order_by = year) - .x)/.x, .names = "pc_{.col}")) %>%
+  ungroup() %>%
+  filter(year == 2011)
+```
+
+#Write Data
+
+```{r}
+write_csv(dd_data, "CleanData/Main/dd_data.csv") #Difference in differences data
+write_csv(es_data, "CleanData/Main/es_data.csv") #Event study data
+write_csv(summary_data, "CleanData/Main/summary_data.csv") #summary statistics data
 ```
 
 

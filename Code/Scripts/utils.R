@@ -16,6 +16,19 @@ balance.panel = function(group_id, panel_length, data) {
   
 }
 
+create.gentrification = function(income_var, college_var, pre_var, income_pctile, college_pctile_lower, college_pctile_upper, pre_pctile, data) {
+  
+  out_data = data %>%
+    dplyr::filter(ifelse(!!as.name(income_var) <= quantile(!!as.name(income_var), probs = income_pctile), 1, 0) == 1) %>%
+    dplyr::mutate(gentrify = case_when(!!as.name(college_var) <= quantile(!!as.name(college_var), probs = college_pctile_lower) ~ 0,
+                                       !!as.name(college_var) >= quantile(!!as.name(college_var), probs = college_pctile_upper) ~ 1)) %>%
+    filter(!is.na(gentrify)) %>%
+    filter(ifelse(!!as.name(pre_var) >= quantile(!!as.name(pre_var), probs = pre_pctile), 1, 0) == 0) 
+  
+  return(out_data)
+  
+}
+
 ##Spatial Functions
 
 st.erase <- function(x, y) {

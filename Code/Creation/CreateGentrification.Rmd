@@ -46,15 +46,10 @@ input_data = acs_data %>%
 #Encode Gentrification
 
 ```{r}
-input_data %>%
-  filter(ifelse(medianincome <= median(medianincome), 1, 0) == 1) %>%
-  mutate(edugentrify = case_when(diff_p_college_pop <= median(diff_p_college_pop) ~ 0,
-                                 diff_p_college_pop >= quantile(diff_p_college_pop, probs = .75) ~ 1)) %>%
-  filter(!is.na(edugentrify)) %>%
-  filter(ifelse(pre_p_college_pop >= quantile(pre_p_college_pop, probs = .75), 1, 0) == 0) %>%
-  group_by(edugentrify) %>%
-  summarize(mean = mean(pre_p_college_pop))
+gen_data = create.gentrification(income_var = "medianincome", college_var = "diff_p_college_pop", pre_var = "pre_p_college_pop",
+                                 income_pctile = .5, college_pctile_lower = .5, college_pctile_upper = .75, pre_pctile = .75, data = input_data)
 ```
+
 
 
 

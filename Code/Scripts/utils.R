@@ -29,6 +29,9 @@ create.gentrification = function(income_var, college_var, pre_var, income_pctile
   
 }
 
+##Output Functions
+
+
 ##Spatial Functions
 
 st.erase <- function(x, y) {

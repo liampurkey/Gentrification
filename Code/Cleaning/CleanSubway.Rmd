@@ -33,3 +33,19 @@ nyc_shp = st_read("RawData/Boundaries/NewYork.shp")
 subway_stops = read_csv("RawData/station_entrances.csv")
 ```
 
+#Prepare Data
+
+```{r}
+#Create subway shapefile
+subway_shp = subway_stops %>%
+  gather(ID, Line, Route_1:Route_11) %>%
+  filter(!is.na(Line)) %>% 
+  select(-ID, -Station_Name) %>%
+  distinct()
+```
+
+```{r}
+subway_shp
+```
+
+

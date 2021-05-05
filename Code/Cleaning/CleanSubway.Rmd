@@ -22,12 +22,14 @@ library(sf)
 library(spData)
 library(tmap)
 library(purrr)
+library(stars)
 source("Code/Scripts/utils.R")
 ```
 
 ```{r}
 #Read in tract shapefile
-nyc_shp = st_read("RawData/Boundaries/NewYork.shp") 
+nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
+  select(-tract_area)
 ```
 
 ```{r}
@@ -44,7 +46,7 @@ subway_shp = subway_stops %>%
   filter(!is.na(Line)) %>% 
   select(-ID, -Station_Name) %>%
   distinct() %>%
-  st_as_sf(coords = c("Station_Longitude", "Station_Latitude"), crs = "NAD83")
+  st_as_sf(coords = c("Station_Longitude", "Station_Latitude"), crs = 4269)
 ```
 
 ```{r}
@@ -52,31 +54,38 @@ subway_shp = subway_stops %>%
 nyc_centroids = st_centroid(nyc_shp)
 ```
 
-```{r}
-subway_shp
-```
-
-#Create Counts of Lines
+#Create Subway Count Function
 
 ```{r}
-aggregate_lines = function(tract) {
+aggregate_lines = function(tract, tracts_shp, id_var, lines, line_var) {
   
-  nearby_lines = cbind(subway_shp, distance = clean.units(st_distance(subway_shp, tract))*0.000621371) %>%
+  tract_shp = tracts_shp %>%
+    dplyr::filter(!!as.name(id_var) == tract)
+  
+  nearby_lines = cbind(lines, distance = clean.units(st_distance(lines, tract_shp))*0.000621371) %>%
     dplyr::filter(distance <= 0.5) %>%
     sf::st_drop_geometry() %>%
-    dplyr::distinct(Line) %>%
+    dplyr::distinct(!!as.name(line_var)) %>%
     dplyr::summarize(n_lines = n()) %>%
-    mutate(GEOID = tract$GEOID)
+    mutate(GEOID = as.character(tract))
     
   return(nearby_lines)
   
 }
 ```
 
+#Use purrr:map to create subway counts
 
 ```{r}
-st_apply(nyc_centroids, MARGIN = GEOID, aggregate_lines)
+lines_access = map_dfr(nyc_centroids$GEOID, aggregate_lines, tracts_shp = nyc_centroids, id_var = "GEOID", lines = subway_shp, line_var = "Line")
 ```
+
+```{r}
+map_data = inner_join(nyc_shp, lines_access)
+```
+
+
+
 
 
 

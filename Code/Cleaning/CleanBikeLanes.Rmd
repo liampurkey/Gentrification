@@ -33,8 +33,31 @@ nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
 ```
 
 ```{r}
-#Read bike lane data
-bikelane_data = st_read("RawData/NYC_BICYCLE_NETWORK_18D_20200214_p/NYC_BICYCLE_NETWORK_18D_20200214.shp")
+#Read bike lane segment data
+segment_data = st_transform(st_read("RawData/NYC_BICYCLE_NETWORK_18D_20200214_p/NYC_BICYCLE_NETWORK_18D_20200214.shp"), 4269)
+```
+
+#Prepare Bike Lane Data
+
+```{r}
+bikelanes_shp = segment_data %>%
+  select(instdate, fromstreet, tostreet) %>% 
+  separate(instdate, into = c("year", "month", "time"), sep = "-") %>%
+  filter(year <= 2011) %>%
+  group_by(fromstreet, tostreet) %>%
+  summarize(geometry = st_union(geometry))
+```
+
+#Create Intersection Data
+
+```{r}
+lane_counts = map_dfr(nyc_shp$GEOID, aggregate_lanes, tracts_shp = nyc_shp, id_var = "GEOID", lanes_shp = bikelanes_shp)
+```
+
+#Write Data
+
+```{r}
+write_csv(lane_counts, "CleanData/lane_counts.csv")
 ```
 
 

@@ -44,12 +44,12 @@ clean.units <- function(x){
   x
 }
 
-aggregate_lines = function(tract, tracts_shp, id_var, lines, line_var) {
+aggregate_lines = function(tract, tracts_shp, id_var, lines_shp, line_var) {
   
   tract_shp = tracts_shp %>%
     dplyr::filter(!!as.name(id_var) == tract)
   
-  nearby_lines = cbind(lines, distance = clean.units(st_distance(lines, tract_shp))*0.000621371) %>%
+  nearby_lines = cbind(lines_shp, distance = clean.units(st_distance(lines_shp, tract_shp))*0.000621371) %>%
     dplyr::filter(distance <= 0.5) %>%
     sf::st_drop_geometry() %>%
     dplyr::distinct(!!as.name(line_var)) %>%
@@ -57,6 +57,20 @@ aggregate_lines = function(tract, tracts_shp, id_var, lines, line_var) {
     mutate(GEOID = as.character(tract))
   
   return(nearby_lines)
+  
+}
+
+aggregate_lanes = function(tract, tracts_shp, id_var, lanes_shp) {
+  
+  tract_shp = tracts_shp %>%
+    dplyr::filter(!!as.name(id_var) == tract)
+  
+  tract_lanes = st_intersection(tract_shp, lanes_shp) %>%
+    sf::st_drop_geometry() %>%
+    dplyr::summarize(n_lanes = n()) %>%
+    mutate(GEOID = as.character(tract))
+  
+  return(tract_lanes)
   
 }
 

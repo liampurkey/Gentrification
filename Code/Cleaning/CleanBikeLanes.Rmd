@@ -22,7 +22,7 @@ library(sf)
 library(spData)
 library(tmap)
 library(purrr)
-library(stars)
+library(rgdal)
 source("Code/Scripts/utils.R")
 ```
 
@@ -31,4 +31,5 @@ source("Code/Scripts/utils.R")
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area)
 ```
+
 

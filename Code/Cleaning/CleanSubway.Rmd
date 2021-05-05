@@ -30,6 +30,7 @@ source("Code/Scripts/utils.R")
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area)
+nyc_shp = st_transform(nyc_shp, 4269)
 ```
 
 ```{r}
@@ -65,6 +66,7 @@ subway_counts = map_dfr(nyc_centroids$GEOID, aggregate_lines, tracts_shp = nyc_c
 ```{r}
 write_csv(subway_counts, "CleanData/subway_counts.csv")
 ```
+
 
 
 

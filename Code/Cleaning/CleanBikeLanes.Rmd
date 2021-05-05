@@ -30,16 +30,18 @@ source("Code/Scripts/utils.R")
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area)
+st_transform(nyc_shp, 2263)
 ```
 
 ```{r}
 #Read bike lane segment data
-segment_data = st_transform(st_read("RawData/NYC_BICYCLE_NETWORK_18D_20200214_p/NYC_BICYCLE_NETWORK_18D_20200214.shp"), 4269)
+segment_data = st_transform(st_read("RawData/NYC_BICYCLE_NETWORK_18D_20200214_p/NYC_BICYCLE_NETWORK_18D_20200214.shp"), 2263)
 ```
 
-#Prepare Bike Lane Data
+#Prepare Data
 
 ```{r}
+#Join bike lane segments
 bikelanes_shp = segment_data %>%
   select(instdate, fromstreet, tostreet) %>% 
   separate(instdate, into = c("year", "month", "time"), sep = "-") %>%
@@ -48,10 +50,15 @@ bikelanes_shp = segment_data %>%
   summarize(geometry = st_union(geometry))
 ```
 
+```{r}
+#Create centroids
+nyc_centroids = st_transform(st_centroid(nyc_shp), 2263)
+```
+
 #Create Intersection Data
 
 ```{r}
-lane_counts = map_dfr(nyc_shp$GEOID, aggregate_lanes, tracts_shp = nyc_shp, id_var = "GEOID", lanes_shp = bikelanes_shp)
+lane_counts = map_dfr(nyc_centroids$GEOID, aggregate_lanes, tracts_shp = nyc_centroids, id_var = "GEOID", lanes_shp = bikelanes_shp)
 ```
 
 #Write Data
@@ -59,6 +66,9 @@ lane_counts = map_dfr(nyc_shp$GEOID, aggregate_lanes, tracts_shp = nyc_shp, id_v
 ```{r}
 write_csv(lane_counts, "CleanData/lane_counts.csv")
 ```
+
+
+
 
 
 

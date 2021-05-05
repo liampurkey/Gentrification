@@ -65,7 +65,7 @@ aggregate_lanes = function(tract, tracts_shp, id_var, lanes_shp) {
   tract_shp = tracts_shp %>%
     dplyr::filter(!!as.name(id_var) == tract)
   
-  tract_lanes = st_intersection(tract_shp, lanes_shp) %>%
+  tract_lanes = st_intersection(st_buffer(tract_shp, dist = 2640), lanes_shp) %>%
     sf::st_drop_geometry() %>%
     dplyr::summarize(n_lanes = n()) %>%
     mutate(GEOID = as.character(tract))

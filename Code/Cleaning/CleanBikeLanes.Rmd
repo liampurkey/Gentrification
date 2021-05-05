@@ -32,4 +32,11 @@ nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area)
 ```
 
+```{r}
+#Read bike lane data
+bikelane_data = st_read("RawData/NYC_BICYCLE_NETWORK_18D_20200214_p/NYC_BICYCLE_NETWORK_18D_20200214.shp")
+```
+
+
+
 

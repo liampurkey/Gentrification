@@ -30,17 +30,19 @@ source("Code/Scripts/utils.R")
 #Collect New York City Census Tract Shapefile
 
 ```{r}
-#Bronx County
+#Collect census tract boundaries
 nyc_tracts = get_acs(state = "NY", county = c("Bronx", "Kings", "New York", "Queens", "Richmond"), 
                      year = 2010, geography = "tract", variables = "B01001_001", geometry = TRUE, cb = FALSE) %>%
   select(GEOID, geometry)
 ```
 
 ```{r}
+#Collect water boundaries to crop census tract boundaries
 nyc_water = area_water(state = "NY", county = c("Bronx", "Kings", "New York", "Queens", "Richmond"), class = "sf")
 ```
 
 ```{r}
+#Crop census tract boundaries
 nyc_geo = st.erase(nyc_tracts, nyc_water)
 ```
 

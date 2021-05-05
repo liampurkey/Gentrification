@@ -1,0 +1,35 @@
+---
+title: "Clean Subway Data"
+author: "Liam Purkey"
+date: "5/5/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load packages
+library(magrittr)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(sf)
+library(spData)
+source("Code/Scripts/utils.R")
+```
+
+```{r}
+#Read in tract shapefile
+nyc_shp = st_read("RawData/Boundaries/NewYork.shp") 
+```
+
+```{r}
+#Read in subway stop data
+subway_stops = read_csv("RawData/station_entrances.csv")
+```
+

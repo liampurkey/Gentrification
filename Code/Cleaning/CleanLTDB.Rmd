@@ -38,6 +38,7 @@ ltdb_raw = read_excel("RawData/ltdb_dp.xlsx", sheet = "LTDB_DP data") %>%
 #Clean Data
 
 ```{r}
+#Add 2000 college population data
 ltdb_clean = ltdb_raw %>%
   rename(GEOID = trtid10) %>%
   inner_join(nyc_tracts, by = "GEOID") %>%

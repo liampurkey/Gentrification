@@ -20,6 +20,8 @@ library(readr)
 library(tidyverse)
 library(sf)
 library(spData)
+library(tmap)
+library(purrr)
 source("Code/Scripts/utils.R")
 ```
 
@@ -41,11 +43,49 @@ subway_shp = subway_stops %>%
   gather(ID, Line, Route_1:Route_11) %>%
   filter(!is.na(Line)) %>% 
   select(-ID, -Station_Name) %>%
-  distinct()
+  distinct() %>%
+  st_as_sf(coords = c("Station_Longitude", "Station_Latitude"), crs = "NAD83")
+```
+
+```{r}
+#Create tract centroids
+nyc_centroids = st_centroid(nyc_shp)
 ```
 
 ```{r}
 subway_shp
 ```
+
+#Create Counts of Lines
+
+```{r}
+aggregate_lines = function(tract) {
+  
+  nearby_lines = cbind(subway_shp, distance = clean.units(st_distance(subway_shp, tract))*0.000621371) %>%
+    dplyr::filter(distance <= 0.5) %>%
+    sf::st_drop_geometry() %>%
+    dplyr::distinct(Line) %>%
+    dplyr::summarize(n_lines = n()) %>%
+    mutate(GEOID = tract$GEOID)
+    
+  return(nearby_lines)
+  
+}
+```
+
+
+```{r}
+st_apply(nyc_centroids, MARGIN = GEOID, aggregate_lines)
+```
+
+
+
+
+
+
+
+
+
+
 
 

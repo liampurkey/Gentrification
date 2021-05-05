@@ -44,3 +44,19 @@ clean.units <- function(x){
   x
 }
 
+aggregate_lines = function(tract, tracts_shp, id_var, lines, line_var) {
+  
+  tract_shp = tracts_shp %>%
+    dplyr::filter(!!as.name(id_var) == tract)
+  
+  nearby_lines = cbind(lines, distance = clean.units(st_distance(lines, tract_shp))*0.000621371) %>%
+    dplyr::filter(distance <= 0.5) %>%
+    sf::st_drop_geometry() %>%
+    dplyr::distinct(!!as.name(line_var)) %>%
+    dplyr::summarize(n_lines = n()) %>%
+    mutate(GEOID = as.character(tract))
+  
+  return(nearby_lines)
+  
+}
+

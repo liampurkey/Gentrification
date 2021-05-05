@@ -34,14 +34,14 @@ nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
 
 ```{r}
 #Read in subway stop data
-subway_stops = read_csv("RawData/station_entrances.csv")
+subway_data = read_csv("RawData/station_entrances.csv")
 ```
 
 #Prepare Data
 
 ```{r}
 #Create subway shapefile
-subway_shp = subway_stops %>%
+subway_shp = subway_data %>%
   gather(ID, Line, Route_1:Route_11) %>%
   filter(!is.na(Line)) %>% 
   select(-ID, -Station_Name) %>%
@@ -54,37 +54,17 @@ subway_shp = subway_stops %>%
 nyc_centroids = st_centroid(nyc_shp)
 ```
 
-#Create Subway Count Function
+#Create Subway Count Data
 
 ```{r}
-aggregate_lines = function(tract, tracts_shp, id_var, lines, line_var) {
-  
-  tract_shp = tracts_shp %>%
-    dplyr::filter(!!as.name(id_var) == tract)
-  
-  nearby_lines = cbind(lines, distance = clean.units(st_distance(lines, tract_shp))*0.000621371) %>%
-    dplyr::filter(distance <= 0.5) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::distinct(!!as.name(line_var)) %>%
-    dplyr::summarize(n_lines = n()) %>%
-    mutate(GEOID = as.character(tract))
-    
-  return(nearby_lines)
-  
-}
+subway_counts = map_dfr(nyc_centroids$GEOID, aggregate_lines, tracts_shp = nyc_centroids, id_var = "GEOID", lines = subway_shp, line_var = "Line")
 ```
 
-#Use purrr:map to create subway counts
+#Write Data
 
 ```{r}
-lines_access = map_dfr(nyc_centroids$GEOID, aggregate_lines, tracts_shp = nyc_centroids, id_var = "GEOID", lines = subway_shp, line_var = "Line")
+write_csv(subway_counts, "CleanData/subway_counts.csv")
 ```
-
-```{r}
-map_data = inner_join(nyc_shp, lines_access)
-```
-
-
 
 
 

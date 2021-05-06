@@ -29,8 +29,8 @@ source("Code/Scripts/utils.R")
 ```{r}
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
-  select(-tract_area)
-nyc_shp = st_transform(nyc_shp, 4269)
+  select(-tract_area) %>%
+  st_transform(4269)
 ```
 
 ```{r}

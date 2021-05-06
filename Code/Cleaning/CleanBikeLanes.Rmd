@@ -22,20 +22,20 @@ library(sf)
 library(spData)
 library(tmap)
 library(purrr)
-library(rgdal)
 source("Code/Scripts/utils.R")
 ```
 
 ```{r}
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
-  select(-tract_area)
-st_transform(nyc_shp, 2263)
+  select(-tract_area) %>%
+  st_transform(2263)
 ```
 
 ```{r}
 #Read bike lane segment data
-segment_data = st_transform(st_read("RawData/NYC_BICYCLE_NETWORK_18D_20200214_p/NYC_BICYCLE_NETWORK_18D_20200214.shp"), 2263)
+segment_data = st_read("RawData/NYC_BICYCLE_NETWORK_18D_20200214_p/NYC_BICYCLE_NETWORK_18D_20200214.shp") %>%
+  st_transform(2263)
 ```
 
 #Prepare Data
@@ -66,6 +66,7 @@ lane_counts = map_dfr(nyc_centroids$GEOID, aggregate_lanes, tracts_shp = nyc_cen
 ```{r}
 write_csv(lane_counts, "CleanData/lane_counts.csv")
 ```
+
 
 
 

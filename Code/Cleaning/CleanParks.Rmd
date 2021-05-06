@@ -29,13 +29,17 @@ source("Code/Scripts/utils.R")
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area) %>%
-  st_transform(4269)
+  st_transform(2263)
 ```
 
 ```{r}
 #Read in parks shapefile
-parks_shp = st_read("Rawdata/Parks\ Properties/geo_export_a8b348d6-27dd-4f41-b3af-d0dbbd495aa3.shp") %>%
-  st_transform(4269)
+parks_shp = st_read("RawData/ARCHIVED\ -\ Parks\ Properties/geo_export_305578e7-67de-47cd-af84-f6770752baff.shp") %>%
+  st_transform(2263)
+```
+
+```{r}
+parks_shp
 ```
 
 

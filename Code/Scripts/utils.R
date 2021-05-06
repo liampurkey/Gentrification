@@ -87,3 +87,19 @@ aggregate_parks = function(tract, tracts_shp, id_var, parks_shp) {
   return(nearby_parks)
   
 }
+
+aggregate_trees = function(tract, tracts_shp, id_var, trees_shp) {
+  
+  tract_shp = tracts_shp %>%
+    dplyr::filter(!!as.name(id_var) == tract)
+  
+  tract_area = clean.units(st_area(tract_shp))*3.86102e-7
+  
+  tract_trees = st_intersection(tract_shp, trees_shp) %>%
+    sf::st_drop_geometry() %>%
+    dplyr::summarize(d_trees = n() / tract_area) %>%
+    mutate(GEOID = as.character(tract))
+  
+  return(tract_trees)
+  
+}

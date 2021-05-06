@@ -35,11 +35,28 @@ nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
 ```{r}
 #Read in parks shapefile
 parks_shp = st_read("RawData/ARCHIVED\ -\ Parks\ Properties/geo_export_305578e7-67de-47cd-af84-f6770752baff.shp") %>%
-  st_transform(2263)
+  select(geometry) %>%
+  st_transform(2263) %>%
+  st_make_valid()
 ```
 
+#Prepare Data
+
 ```{r}
-parks_shp
+#Create centroids
+nyc_centroids = st_transform(st_centroid(nyc_shp), 2263)
+```
+
+#Clean Data
+
+```{r}
+park_counts = map_dfr(nyc_centroids$GEOID, aggregate_parks, tracts_shp = nyc_centroids, id_var = "GEOID", parks_shp = parks_shp)
+```
+
+#Write Data
+
+```{r}
+write_csv(park_counts, "CleanData/park_counts")
 ```
 
 

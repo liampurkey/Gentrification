@@ -22,6 +22,7 @@ library(sf)
 library(spData)
 library(tmap)
 library(purrr)
+library(furrr)
 source("Code/Scripts/utils.R")
 ```
 
@@ -44,7 +45,13 @@ trees_shp = read_csv("RawData/2005_Street_Tree_Census.csv") %>%
 #Aggregate Tree Count
 
 ```{r}
-test = map_dfr(c(36047002100, 36085000600, 36085000700, 36085001800, 36085000300), aggregate_trees, tracts_shp = nyc_shp, id_var = "GEOID", trees_shp = trees_shp)
+#Set up parallel environment
+plan(multisession, workers = 3)
+```
+
+```{r}
+#Use future map to calculate tree densities
+tree_density = future_map_dfr(nyc_shp$GEOID, aggregate_trees, tracts_shp = nyc_shp, id_var = "GEOID", trees_shp = trees_shp, .progress = TRUE)
 ```
 
 #Write Tree Data
@@ -52,5 +59,6 @@ test = map_dfr(c(36047002100, 36085000600, 36085000700, 36085001800, 36085000300
 ```{r}
 write_csv(tree_density, "CleanData/tree_density.csv")
 ```
+
 
 

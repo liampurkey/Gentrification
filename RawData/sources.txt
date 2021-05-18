@@ -1,0 +1,23 @@
+***This file contains information about the raw data sources used for this project
+
+*2005_Street_Tree_Census.csv: Census of trees in New York City in 2005
+	https://data.cityofnewyork.us/Environment/2005-Street-Tree-Census/29bw-z7pj
+*ACS_raw.csv: 2007-2011 and 2014-2018 American Community Survey data
+*ARCHIVED - Parks Properties: Shapefile of parks owned by the City of New York
+	https://data.cityofnewyork.us/City-Government/ARCHIVED-Parks-Properties/k2ya-ucmv
+*Boundaries: Census tract boundaries Shapefile
+*cbd.csv: Obtained from Daniel Hartley @ Federal Reserve Bank of Chicago
+*graduation_rates.xlsx: High school graduation rates by public school district
+	https://infohub.nyced.org/reports/academics/graduation-results
+*ltdb_dp.xlsx: Longitudinal Tract Database-Differential Privacy for 2000 Census
+	https://s4.ad.brown.edu/projects/diversity/researcher/LTDB.htm
+*NYC_BICYCLE_NETWORK_18D_20200214_p: Shapefile of bike lanes in New York City
+	https://data.cityofnewyork.us/Transportation/Bicycle-Routes/7vsa-caz7
+	archived_nyc_bike_routes_2010.zip
+*permit_issuances: construction permits issued by the department of buildings for the 2009-2011 period
+	https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a/data
+*pluto: Extensive land use and geographic data at the tax lot level
+	https://www1.nyc.gov/site/planning/data-maps/open-data/bytes-archive.page?sorts[year]=0
+*station_entrances.csv: Location of subway station entrances
+	http://web.mta.info/developers/sbwy_entrance.html
+*WAC: Longitudinal Employer-Household Dynamics Origin Destination Statistics

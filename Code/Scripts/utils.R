@@ -103,3 +103,7 @@ aggregate_trees = function(tract, tracts_shp, id_var, trees_shp) {
   return(tract_trees)
   
 }
+
+aggregate_permits = function(tract, tracts_shp, id_var, permits_shp) {
+  
+}

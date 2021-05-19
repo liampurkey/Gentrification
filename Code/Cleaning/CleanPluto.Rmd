@@ -1,0 +1,40 @@
+---
+title: "Clean Pluto Data"
+author: "Liam Purkey"
+date: "5/18/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load packages
+library(magrittr)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(sf)
+library(spData)
+library(tmap)
+library(purrr)
+library(furrr)
+source("Code/Scripts/utils.R")
+```
+
+```{r}
+#Read in pluto data
+pluto = read_csv("RawData/pluto/bk11v2.txt")
+```
+
+```{r}
+pluto %>%
+  select(CT2010, SchoolDist, ZoneDist1, LotArea, ComArea, ResArea, RetailArea) %>%
+  filter(!is.na(CT2010)) %>%
+  filter(!is.na(ZoneDist1))
+```
+

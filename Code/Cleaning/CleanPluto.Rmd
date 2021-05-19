@@ -35,6 +35,13 @@ pluto = read_csv("RawData/pluto/bk11v2.txt")
 pluto %>%
   select(CT2010, SchoolDist, ZoneDist1, LotArea, ComArea, ResArea, RetailArea) %>%
   filter(!is.na(CT2010)) %>%
-  filter(!is.na(ZoneDist1))
+  filter(!is.na(ZoneDist1)) %>%
+  mutate(zone = case_when(grepl("/", ZoneDist1) ~ "MR",
+                          !grepl("/", ZoneDist1) ~ str_sub(ZoneDist1, 1, 1))) 
 ```
+```{r}
+grepl("/", "a/bbba")
+```
+
+
 

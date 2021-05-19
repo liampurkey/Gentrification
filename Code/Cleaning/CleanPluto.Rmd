@@ -32,7 +32,8 @@ pluto = read_csv("RawData/pluto/bk11v2.txt")
 ```
 
 ```{r}
-pluto %>%
+#Create zoning data
+pluto_zones = pluto %>%
   select(CT2010, ZoneDist1, Overlay1, LotArea) %>%
   filter(!is.na(CT2010)) %>%
   filter(!is.na(ZoneDist1)) %>%
@@ -40,20 +41,23 @@ pluto %>%
                           grepl("R6|R7|R8|R9|R10", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R6_R10",
                           grepl("C1|C2", Overlay1) ~ "C1_C2",
                           grepl("C4", ZoneDist1) ~ "C4",
-                          grepl("C5|C6", ZoneDist1) ~ "C5_C6",
                           grepl("/", ZoneDist1) ~ "MR")) %>%
-  filter(!is.na(zone)) %>%
+  mutate(zone = ifelse(is.na(zone), "other", zone)) %>%
   group_by(CT2010) %>%
   mutate(total_area = sum(as.numeric(LotArea))) %>%
   group_by(CT2010, zone) %>%
   summarise(zone_area = sum(as.numeric(LotArea)/total_area)) %>%
   ungroup() %>%
-  arrange(CT2010)
+  spread(key = zone, value = zone_area) %>%
+  replace(is.na(.), 0) %>%
+  rename(GEOID = CT2010) %>%
+  select(-other)
 ```
 
 ```{r}
-length(unique(pluto$CT2010))
+pluto_zones 
 ```
+
 
 
 

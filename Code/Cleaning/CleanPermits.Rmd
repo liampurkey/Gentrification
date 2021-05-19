@@ -34,7 +34,49 @@ nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
 ```
 
 ```{r}
-#Read in street tree data 
-permits_shp = read_csv("RawData/permit_issuances.csv") 
+#Read in permit data 
+permits_shp = read_csv("RawData/permit_issuances.csv")%>%
+  select(Residential, "Filing Date", LATITUDE, LONGITUDE) %>%
+  filter(Residential == "YES") %>%
+  rename(latitude = LATITUDE) %>%
+  rename(longitude = LONGITUDE) %>%
+  separate(!!as.name("Filing Date"), into = c("month", "day", "year"), sep = "/") %>%
+  select(-month, -day, -Residential) %>%
+  filter(!is.na(longitude) & !is.na(latitude)) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4269)
+#Create 2011 permit data
+permits_2011_shp = permits_shp %>%
+  filter(year == 11)
 ```
+
+#Aggregate Permits 
+
+##2011
+
+```{r}
+permit_counts_2011 = map_dfr(nyc_shp$GEOID, aggregate_permits, tracts_shp = nyc_shp, 
+                             id_var = "GEOID", permits_shp = permits_2011_shp) %>%
+  rename(d_permits_2011 = d_permits)
+```
+
+##2009-2011
+
+```{r}
+permit_counts = map_dfr(nyc_shp$GEOID, aggregate_permits, tracts_shp = nyc_shp, id_var = "GEOID", permits_shp = permits_shp) 
+```
+
+#Join and Write Data
+
+```{r}
+permit_data = inner_join(permit_counts, permit_counts_2011, by = "GEOID")
+```
+
+```{r}
+write_csv(permit_data, "CleanData/permit_density.csv")
+```
+
+
+
+
+
 

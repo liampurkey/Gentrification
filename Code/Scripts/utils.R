@@ -22,12 +22,85 @@ create.gentrification = function(income_var, college_var, pre_var, income_pctile
     dplyr::filter(ifelse(!!as.name(income_var) <= quantile(!!as.name(income_var), probs = income_pctile), 1, 0) == 1) %>%
     dplyr::mutate(gentrify = case_when(!!as.name(college_var) <= quantile(!!as.name(college_var), probs = college_pctile_lower) ~ 0,
                                        !!as.name(college_var) >= quantile(!!as.name(college_var), probs = college_pctile_upper) ~ 1)) %>%
-    filter(!is.na(gentrify)) %>%
-    filter(ifelse(!!as.name(pre_var) >= quantile(!!as.name(pre_var), probs = pre_pctile), 1, 0) == 0) 
+    dplyr::filter(!is.na(gentrify)) %>%
+    dplyr::filter(ifelse(!!as.name(pre_var) >= quantile(!!as.name(pre_var), probs = pre_pctile), 1, 0) == 0) 
   
   return(out_data)
   
 }
+
+tract.to.geoid = function(boro_code, tract_var, data) {
+  
+  #Kings County
+  if (boro_code == "047") {
+    
+    out_data = data %>%
+      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
+      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36047000", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3604700", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360470", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36047", !!as.name(tract_var), sep = "")))
+  
+  #Bronx County  
+  } else if (boro_code == "005") {
+    
+    out_data = data %>%
+      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
+      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36005000", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3600500", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360050", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36005", !!as.name(tract_var), sep = "")))
+  
+  #New York County  
+  } else if (boro_code == "061") {
+    
+    out_data = data %>%
+      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
+      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36061000", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3606100", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360610", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36061", !!as.name(tract_var), sep = "")))
+    
+  #Queens County
+  } else if (boro_code == "081") {
+    
+    out_data = data %>%
+      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
+      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36081000", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3608100", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360810", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36081", !!as.name(tract_var), sep = "")))
+  
+  #Richmond County 
+  } else if (boro_code == "085") {
+    
+    out_data = data %>%
+      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
+      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36085000", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3608500", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360850", !!as.name(tract_var), sep = ""),
+                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36085", !!as.name(tract_var), sep = "")))
+    
+  } else {
+    
+    stop(paste(boro_code, "is not a valid borough code", sep = " "), .call = FALSE)
+    
+  }
+  
+  #Test that tract.to.geoid returns valid geoid
+  if (isFALSE(all(str_length(as.vector(as.matrix(out_data[,tract_var]))) == 11))) {
+    
+    stop("some geoids do not have length 11", .call = FALSE)
+    
+  } else {
+    
+    return(out_data)
+    
+  }
+  
+}
+
+
 
 ##Output Functions
 
@@ -44,7 +117,7 @@ clean.units <- function(x){
   x
 }
 
-aggregate_lines = function(tract, tracts_shp, id_var, lines_shp, line_var) {
+aggregate.lines = function(tract, tracts_shp, id_var, lines_shp, line_var) {
   
   tract_shp = tracts_shp %>%
     dplyr::filter(!!as.name(id_var) == tract)
@@ -60,7 +133,7 @@ aggregate_lines = function(tract, tracts_shp, id_var, lines_shp, line_var) {
   
 }
 
-aggregate_lanes = function(tract, tracts_shp, id_var, lanes_shp) {
+aggregate.lanes = function(tract, tracts_shp, id_var, lanes_shp) {
   
   tract_shp = tracts_shp %>%
     dplyr::filter(!!as.name(id_var) == tract)
@@ -74,7 +147,7 @@ aggregate_lanes = function(tract, tracts_shp, id_var, lanes_shp) {
   
 }
 
-aggregate_parks = function(tract, tracts_shp, id_var, parks_shp) {
+aggregate.parks = function(tract, tracts_shp, id_var, parks_shp) {
   
   tract_shp = tracts_shp %>%
     dplyr::filter(!!as.name(id_var) == tract)
@@ -88,7 +161,7 @@ aggregate_parks = function(tract, tracts_shp, id_var, parks_shp) {
   
 }
 
-aggregate_trees = function(tract, tracts_shp, id_var, trees_shp) {
+aggregate.trees = function(tract, tracts_shp, id_var, trees_shp) {
   
   tract_shp = tracts_shp %>%
     dplyr::filter(!!as.name(id_var) == tract)
@@ -104,7 +177,7 @@ aggregate_trees = function(tract, tracts_shp, id_var, trees_shp) {
   
 }
 
-aggregate_permits = function(tract, tracts_shp, id_var, permits_shp) {
+aggregate.permits = function(tract, tracts_shp, id_var, permits_shp) {
   
   tract_shp = tracts_shp %>%
     dplyr::filter(!!as.name(id_var) == tract)

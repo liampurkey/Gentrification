@@ -28,15 +28,31 @@ source("Code/Scripts/utils.R")
 
 ```{r}
 #Read in pluto data
-pluto = read_csv("RawData/pluto/bk11v2.txt")
+pluto_bk = read_csv("RawData/pluto/bk11v2.txt", 
+                    col_types = cols_only(CT2010 = col_double(), ZoneDist1 = col_character(), Overlay1 = col_character(), LotArea = col_double(), SchoolDist = col_double())) %>%
+  filter(!is.na(CT2010) & !is.na(ZoneDist1)) 
+pluto_bx = read_csv("RawData/pluto/bx11v2.txt", 
+                    col_types = cols_only(CT2010 = col_double(), ZoneDist1 = col_character(), Overlay1 = col_character(), LotArea = col_double(), SchoolDist = col_double())) %>%
+  filter(!is.na(CT2010) & !is.na(ZoneDist1)) 
+pluto_mn = read_csv("RawData/pluto/mn11v2.txt", 
+                    col_types = cols_only(CT2010 = col_double(), ZoneDist1 = col_character(), Overlay1 = col_character(), LotArea = col_double(), SchoolDist = col_double())) %>%
+  filter(!is.na(CT2010) & !is.na(ZoneDist1)) 
+pluto_qn = read_csv("RawData/pluto/qn11v2.txt", 
+                    col_types = cols_only(CT2010 = col_double(), ZoneDist1 = col_character(), Overlay1 = col_character(), LotArea = col_double(), SchoolDist = col_double())) %>%
+  filter(!is.na(CT2010) & !is.na(ZoneDist1)) 
+pluto_si = read_csv("RawData/pluto/si11v2.txt", 
+                    col_types = cols_only(CT2010 = col_double(), ZoneDist1 = col_character(), Overlay1 = col_character(), LotArea = col_double(), SchoolDist = col_double())) %>%
+  filter(!is.na(CT2010) & !is.na(ZoneDist1)) 
 ```
+
+#Create Zoning Data
+
+##Brooklyn
 
 ```{r}
 #Create zoning data
-pluto_zones = pluto %>%
+zoning_bk = pluto_bk %>%
   select(CT2010, ZoneDist1, Overlay1, LotArea) %>%
-  filter(!is.na(CT2010)) %>%
-  filter(!is.na(ZoneDist1)) %>%
   mutate(zone = case_when(grepl("R1|R2|R3|R4|R5", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R1_R5",
                           grepl("R6|R7|R8|R9|R10", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R6_R10",
                           grepl("C1|C2", Overlay1) ~ "C1_C2",
@@ -51,14 +67,9 @@ pluto_zones = pluto %>%
   spread(key = zone, value = zone_area) %>%
   replace(is.na(.), 0) %>%
   rename(GEOID = CT2010) %>%
-  select(-other)
+  select(-other) %>%
+  tract.to.geoid(boro_code = "047", tract_var = "GEOID", data = .)
 ```
-
-```{r}
-pluto_zones 
-```
-
-
 
 
 

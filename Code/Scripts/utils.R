@@ -29,12 +29,37 @@ create.gentrification = function(income_var, college_var, pre_var, income_pctile
   
 }
 
-tract.to.geoid = function(boro_code, tract_var, data) {
+clean.zoning = function(zoning_var, overlay_var, lot_area_var, borough, id_var, data) {
+  
+  out_data = data %>%
+    select(all_of(c(id_var, zoning_var, overlay_var, lot_area_var))) %>%
+    mutate(zoning = case_when(grepl("R1|R2|R3|R4|R5", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R1_R5",
+                            grepl("R6|R7|R8|R9|R10", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R6_R10",
+                            grepl("C1|C2", !!as.name(overlay_var)) ~ "C1_C2",
+                            grepl("C4", !!as.name(zoning_var)) ~ "C4",
+                            grepl("/", !!as.name(zoning_var)) ~ "MR")) %>%
+    mutate(zoning = ifelse(is.na(zoning), "other", zoning)) %>%
+    group_by(!!as.name(id_var)) %>%
+    mutate(total_area = sum(as.numeric(!!as.name(lot_area_var)))) %>%
+    group_by(!!as.name(id_var), zoning) %>%
+    summarise(zoning_area = sum(as.numeric(LotArea)/total_area)) %>%
+    ungroup() %>%
+    spread(key = zoning, value = zoning_area) %>%
+    replace(is.na(.), 0) %>%
+    rename(GEOID = !!as.name(id_var)) %>%
+    select(-other) %>%
+    tract.to.geoid(borough = borough, tract_var = "GEOID", data = .)
+  
+  return(out_data)
+  
+}
+  
+tract.to.geoid = function(borough, tract_var, data) {
   
   #Kings County
-  if (boro_code == "047") {
+  if (borough == "brooklyn") {
     
-    out_data = data %>%
+    clean_data = data %>%
       dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
       dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36047000", !!as.name(tract_var), sep = ""),
                                                             stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3604700", !!as.name(tract_var), sep = ""),
@@ -42,9 +67,9 @@ tract.to.geoid = function(boro_code, tract_var, data) {
                                                             stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36047", !!as.name(tract_var), sep = "")))
   
   #Bronx County  
-  } else if (boro_code == "005") {
+  } else if (borough == "bronx") {
     
-    out_data = data %>%
+    clean_data = data %>%
       dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
       dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36005000", !!as.name(tract_var), sep = ""),
                                                             stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3600500", !!as.name(tract_var), sep = ""),
@@ -52,9 +77,9 @@ tract.to.geoid = function(boro_code, tract_var, data) {
                                                             stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36005", !!as.name(tract_var), sep = "")))
   
   #New York County  
-  } else if (boro_code == "061") {
+  } else if (borough == "manhattan") {
     
-    out_data = data %>%
+    clean_data = data %>%
       dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
       dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36061000", !!as.name(tract_var), sep = ""),
                                                             stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3606100", !!as.name(tract_var), sep = ""),
@@ -62,9 +87,9 @@ tract.to.geoid = function(boro_code, tract_var, data) {
                                                             stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36061", !!as.name(tract_var), sep = "")))
     
   #Queens County
-  } else if (boro_code == "081") {
+  } else if (borough == "queens") {
     
-    out_data = data %>%
+    clean_data = data %>%
       dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
       dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36081000", !!as.name(tract_var), sep = ""),
                                                             stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3608100", !!as.name(tract_var), sep = ""),
@@ -72,9 +97,9 @@ tract.to.geoid = function(boro_code, tract_var, data) {
                                                             stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36081", !!as.name(tract_var), sep = "")))
   
   #Richmond County 
-  } else if (boro_code == "085") {
+  } else if (borough == "staten") {
     
-    out_data = data %>%
+    clean_data = data %>%
       dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
       dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36085000", !!as.name(tract_var), sep = ""),
                                                             stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3608500", !!as.name(tract_var), sep = ""),
@@ -83,19 +108,18 @@ tract.to.geoid = function(boro_code, tract_var, data) {
     
   } else {
     
-    stop(paste(boro_code, "is not a valid borough code", sep = " "), .call = FALSE)
+    stop(paste(borough, "is not a valid borough code", sep = " "), .call = FALSE)
     
   }
   
   #Test that tract.to.geoid returns valid geoid
-  if (isFALSE(all(str_length(as.vector(as.matrix(out_data[,tract_var]))) == 11))) {
+  if (isFALSE(all(str_length(as.vector(as.matrix(clean_data[,tract_var]))) == 11))) {
     
     stop("some geoids do not have length 11", .call = FALSE)
     
   } else {
     
-    return(out_data)
-    
+    return(clean_data)
   }
   
 }

@@ -50,127 +50,20 @@ pluto_si = read_csv("RawData/pluto/si11v2.txt",
 ##Brooklyn
 
 ```{r}
-#Create zoning data
-zoning_bk = pluto_bk %>%
-  select(CT2010, ZoneDist1, Overlay1, LotArea) %>%
-  mutate(zone = case_when(grepl("R1|R2|R3|R4|R5", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R1_R5",
-                          grepl("R6|R7|R8|R9|R10", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R6_R10",
-                          grepl("C1|C2", Overlay1) ~ "C1_C2",
-                          grepl("C4", ZoneDist1) ~ "C4",
-                          grepl("/", ZoneDist1) ~ "MR")) %>%
-  mutate(zone = ifelse(is.na(zone), "other", zone)) %>%
-  group_by(CT2010) %>%
-  mutate(total_area = sum(as.numeric(LotArea))) %>%
-  group_by(CT2010, zone) %>%
-  summarise(zone_area = sum(as.numeric(LotArea)/total_area)) %>%
-  ungroup() %>%
-  spread(key = zone, value = zone_area) %>%
-  replace(is.na(.), 0) %>%
-  rename(GEOID = CT2010) %>%
-  select(-other) %>%
-  tract.to.geoid(boro_code = "047", tract_var = "GEOID", data = .)
-```
-
-##Bronx
-
-```{r}
-#Create zoning data
-zoning_bx = pluto_bx %>%
-  select(CT2010, ZoneDist1, Overlay1, LotArea) %>%
-  mutate(zone = case_when(grepl("R1|R2|R3|R4|R5", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R1_R5",
-                          grepl("R6|R7|R8|R9|R10", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R6_R10",
-                          grepl("C1|C2", Overlay1) ~ "C1_C2",
-                          grepl("C4", ZoneDist1) ~ "C4",
-                          grepl("/", ZoneDist1) ~ "MR")) %>%
-  mutate(zone = ifelse(is.na(zone), "other", zone)) %>%
-  group_by(CT2010) %>%
-  mutate(total_area = sum(as.numeric(LotArea))) %>%
-  group_by(CT2010, zone) %>%
-  summarise(zone_area = sum(as.numeric(LotArea)/total_area)) %>%
-  ungroup() %>%
-  spread(key = zone, value = zone_area) %>%
-  replace(is.na(.), 0) %>%
-  rename(GEOID = CT2010) %>%
-  select(-other) %>%
-  tract.to.geoid(boro_code = "005", tract_var = "GEOID", data = .)
-```
-
-##Manhattan
-
-```{r}
-#Create zoning data
-zoning_mn = pluto_mn %>%
-  select(CT2010, ZoneDist1, Overlay1, LotArea) %>%
-  mutate(zone = case_when(grepl("R1|R2|R3|R4|R5", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R1_R5",
-                          grepl("R6|R7|R8|R9|R10", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R6_R10",
-                          grepl("C1|C2", Overlay1) ~ "C1_C2",
-                          grepl("C4", ZoneDist1) ~ "C4",
-                          grepl("/", ZoneDist1) ~ "MR")) %>%
-  mutate(zone = ifelse(is.na(zone), "other", zone)) %>%
-  group_by(CT2010) %>%
-  mutate(total_area = sum(as.numeric(LotArea))) %>%
-  group_by(CT2010, zone) %>%
-  summarise(zone_area = sum(as.numeric(LotArea)/total_area)) %>%
-  ungroup() %>%
-  spread(key = zone, value = zone_area) %>%
-  replace(is.na(.), 0) %>%
-  rename(GEOID = CT2010) %>%
-  select(-other) %>%
-  tract.to.geoid(boro_code = "061", tract_var = "GEOID", data = .)
-```
-
-##Queens 
-
-```{r}
-#Create zoning data
-zoning_qn = pluto_qn %>%
-  select(CT2010, ZoneDist1, Overlay1, LotArea) %>%
-  mutate(zone = case_when(grepl("R1|R2|R3|R4|R5", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R1_R5",
-                          grepl("R6|R7|R8|R9|R10", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R6_R10",
-                          grepl("C1|C2", Overlay1) ~ "C1_C2",
-                          grepl("C4", ZoneDist1) ~ "C4",
-                          grepl("/", ZoneDist1) ~ "MR")) %>%
-  mutate(zone = ifelse(is.na(zone), "other", zone)) %>%
-  group_by(CT2010) %>%
-  mutate(total_area = sum(as.numeric(LotArea))) %>%
-  group_by(CT2010, zone) %>%
-  summarise(zone_area = sum(as.numeric(LotArea)/total_area)) %>%
-  ungroup() %>%
-  spread(key = zone, value = zone_area) %>%
-  replace(is.na(.), 0) %>%
-  rename(GEOID = CT2010) %>%
-  select(-other) %>%
-  tract.to.geoid(boro_code = "081", tract_var = "GEOID", data = .)
-```
-
-##Staten Island
-
-```{r}
-#Create zoning data
-zoning_si = pluto_si %>%
-  select(CT2010, ZoneDist1, Overlay1, LotArea) %>%
-  mutate(zone = case_when(grepl("R1|R2|R3|R4|R5", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R1_R5",
-                          grepl("R6|R7|R8|R9|R10", ZoneDist1) & !grepl("/", ZoneDist1) ~ "R6_R10",
-                          grepl("C1|C2", Overlay1) ~ "C1_C2",
-                          grepl("C4", ZoneDist1) ~ "C4",
-                          grepl("/", ZoneDist1) ~ "MR")) %>%
-  mutate(zone = ifelse(is.na(zone), "other", zone)) %>%
-  group_by(CT2010) %>%
-  mutate(total_area = sum(as.numeric(LotArea))) %>%
-  group_by(CT2010, zone) %>%
-  summarise(zone_area = sum(as.numeric(LotArea)/total_area)) %>%
-  ungroup() %>%
-  spread(key = zone, value = zone_area) %>%
-  replace(is.na(.), 0) %>%
-  rename(GEOID = CT2010) %>%
-  select(-other) %>%
-  tract.to.geoid(boro_code = "085", tract_var = "GEOID", data = .)
+zoning_pluto_bk %>%
+  clean.zoning(zoning_var = "ZoneDist1", overlay_var = "Overlay1", lot_area_var = "LotArea", borough = "brooklyn", "CT2010", data = .)
 ```
 
 #Clean School District Data
 
 ```{r}
+grad = read_excel("RawData/graduation_rates.xlsx", sheet = "All") %>%
+  filter(!!as.name("Cohort Year") == 2007 & Cohort == "4 year June") %>%
+  rename(SchoolDist = District)
+```
 
+```{r}
+grad
 ```
 
 ```{r}
@@ -182,7 +75,10 @@ pluto_bk %>%
   mutate(total_area = sum(as.numeric(LotArea))) %>%
   group_by(CT2010, SchoolDist) %>%
   summarise(dist_area = sum(as.numeric(LotArea)/total_area)) %>%
-  ungroup() 
+  ungroup() %>%
+  inner_join(grad, by = "SchoolDist") %>%
+  group_by(CT2010) %>%
+  summarize(grad_rate = sum(!!as.name("% Grads")/100 * dist_area))
 ```
 
 

@@ -29,98 +29,55 @@ create.gentrification = function(income_var, college_var, pre_var, income_pctile
   
 }
 
-clean.zoning = function(zoning_var, overlay_var, lot_area_var, borough, id_var, data) {
+clean.zoning = function(zoning_var, overlay_var, lot_area_var, boro_code, id_var, data) {
   
   out_data = data %>%
-    select(all_of(c(id_var, zoning_var, overlay_var, lot_area_var))) %>%
-    mutate(zoning = case_when(grepl("R1|R2|R3|R4|R5", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R1_R5",
+    dplyr::select(tidyselect::all_of(c(id_var, zoning_var, overlay_var, lot_area_var))) %>% #Select variables
+    dplyr::mutate(zoning = dplyr::case_when(grepl("R1|R2|R3|R4|R5", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R1_R5", #Aggregate zoning districts
                             grepl("R6|R7|R8|R9|R10", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R6_R10",
                             grepl("C1|C2", !!as.name(overlay_var)) ~ "C1_C2",
                             grepl("C4", !!as.name(zoning_var)) ~ "C4",
                             grepl("/", !!as.name(zoning_var)) ~ "MR")) %>%
-    mutate(zoning = ifelse(is.na(zoning), "other", zoning)) %>%
-    group_by(!!as.name(id_var)) %>%
-    mutate(total_area = sum(as.numeric(!!as.name(lot_area_var)))) %>%
-    group_by(!!as.name(id_var), zoning) %>%
-    summarise(zoning_area = sum(as.numeric(LotArea)/total_area)) %>%
-    ungroup() %>%
-    spread(key = zoning, value = zoning_area) %>%
+    dplyr::mutate(zoning = ifelse(is.na(zoning), "other", zoning)) %>% #Create other zoning districts variable
+    dplyr::group_by(!!as.name(id_var)) %>%
+    dplyr::mutate(total_area = sum(as.numeric(!!as.name(lot_area_var)))) %>% #Calculate total lot area in tract
+    dplyr::group_by(!!as.name(id_var), zoning) %>%
+    dplyr::summarise(zoning_area = sum(as.numeric(LotArea)/total_area)) %>% #Calculate share of tract area by aggregate zoning district
+    dplyr::ungroup() %>%
+    tidyr::spread(key = zoning, value = zoning_area) %>% #Create lot share variables for each aggregate zoning district
     replace(is.na(.), 0) %>%
-    rename(GEOID = !!as.name(id_var)) %>%
-    select(-other) %>%
-    tract.to.geoid(borough = borough, tract_var = "GEOID", data = .)
+    dplyr::rename(GEOID = !!as.name(id_var)) %>%
+    dplyr::select(-other) %>%
+    tract.to.geoid(boro_code = boro_code, tract_var = "GEOID", data = .) #Map tract numbers to geoids
   
   return(out_data)
   
 }
   
-tract.to.geoid = function(borough, tract_var, data) {
+tract.to.geoid = function(boro_code, tract_var, data) {
   
-  #Kings County
-  if (borough == "brooklyn") {
+  #Test that the given boro_code is valid
+  if (!boro_code %in% c("005", "047", "061", "081", "085")) {
     
-    clean_data = data %>%
-      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
-      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36047000", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3604700", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360470", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36047", !!as.name(tract_var), sep = "")))
+    stop(paste(boro_code, "is not valid", sep = " "), .call = FALSE)
+    
+  } 
   
-  #Bronx County  
-  } else if (borough == "bronx") {
-    
-    clean_data = data %>%
-      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
-      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36005000", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3600500", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360050", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36005", !!as.name(tract_var), sep = "")))
-  
-  #New York County  
-  } else if (borough == "manhattan") {
-    
-    clean_data = data %>%
-      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
-      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36061000", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3606100", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360610", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36061", !!as.name(tract_var), sep = "")))
-    
-  #Queens County
-  } else if (borough == "queens") {
-    
-    clean_data = data %>%
-      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
-      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36081000", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3608100", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360810", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36081", !!as.name(tract_var), sep = "")))
-  
-  #Richmond County 
-  } else if (borough == "staten") {
-    
-    clean_data = data %>%
-      dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
-      dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36085000", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("3608500", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("360850", !!as.name(tract_var), sep = ""),
-                                                            stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36085", !!as.name(tract_var), sep = "")))
-    
-  } else {
-    
-    stop(paste(borough, "is not a valid borough code", sep = " "), .call = FALSE)
-    
-  }
+  geoid_data = data %>%
+    dplyr::mutate(!!as.name(tract_var) := as.character(!!as.name(tract_var)*100)) %>%
+    dplyr::mutate(!!as.name(tract_var) := dplyr::case_when(stringr::str_length(!!as.name(tract_var)) == 3 ~ paste("36", boro_code, "000", !!as.name(tract_var), sep = ""),
+                                                           stringr::str_length(!!as.name(tract_var)) == 4 ~ paste("36", boro_code, "00", !!as.name(tract_var), sep = ""),
+                                                           stringr::str_length(!!as.name(tract_var)) == 5 ~ paste("36", boro_code, "0", !!as.name(tract_var), sep = ""),
+                                                           stringr::str_length(!!as.name(tract_var)) == 6 ~ paste("36", boro_code, !!as.name(tract_var), sep = "")))
   
   #Test that tract.to.geoid returns valid geoid
-  if (isFALSE(all(str_length(as.vector(as.matrix(clean_data[,tract_var]))) == 11))) {
+  if (isFALSE(all(str_length(as.vector(as.matrix(geoid_data[,tract_var]))) == 11))) {
     
     stop("some geoids do not have length 11", .call = FALSE)
     
-  } else {
-    
-    return(clean_data)
-  }
+  } 
+  
+  return(geoid_data)
   
 }
 

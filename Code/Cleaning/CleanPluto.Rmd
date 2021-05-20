@@ -50,8 +50,8 @@ pluto_si = read_csv("RawData/pluto/si11v2.txt",
 ##Brooklyn
 
 ```{r}
-zoning_pluto_bk %>%
-  clean.zoning(zoning_var = "ZoneDist1", overlay_var = "Overlay1", lot_area_var = "LotArea", borough = "brooklyn", "CT2010", data = .)
+pluto_bk %>%
+  clean.zoning(zoning_var = "ZoneDist1", overlay_var = "Overlay1", lot_area_var = "LotArea", boro_code = "047", "CT2010", data = .)
 ```
 
 #Clean School District Data

@@ -1,0 +1,48 @@
+---
+title: "Clean Housing Maintenance Violations"
+author: "Liam Purkey"
+date: "5/21/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load packages
+library(magrittr)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(sf)
+library(spData)
+library(tmap)
+library(purrr)
+library(furrr)
+library(data.table)
+source("Code/Scripts/utils.R")
+```
+
+```{r}
+#Read in violations data
+violations = fread("RawData/housing_violations.csv")
+```
+
+#Clean Violations Data
+
+```{r}
+violations_2011 = violations[grepl("2011", InspectionDate) & Class != "I"]
+```
+
+```{r}
+violations_2011 %>%
+  group_by(Borough, CensusTract, Class) %>%
+  summarize(n_violations = n())
+```
+
+
+

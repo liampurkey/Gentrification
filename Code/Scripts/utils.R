@@ -192,3 +192,33 @@ aggregate.permits = function(tract, tracts_shp, id_var, permits_shp) {
   return(tract_permits)
   
 }
+
+spatial.aggregate = function(unit_id, unit_var, units_shp, aggregate_shp, aggregation_type) {
+  
+  #Readme: This function takes in a single unit id from a shapefile with multiple units as well as
+  #shapefile with point, line, or polygon features to aggregate according to some aggregation
+  #criterion. The function can then be passed to a mapping function such as purrr::map_dfr to aggregate
+  #the feature of interest for all units in the data set.
+  
+  #Check that the given aggregation type is valid
+  if (!aggregation_type %in% c("intersection")) {
+    
+    stop(paste(aggregation_type, "is not a valid aggregation type", sep = ""))
+    
+  }
+  
+  #Select unit from set of units
+  unit_shp = units_shp %>%
+    dplyr::filter(!!as.name(unit_var) == unit_id)
+  
+  if (aggregation_type == "intersection") {
+    
+    #The intersection option aggregates features by taking the intersection of the unit shapefie 
+    #and the feature shapefile
+    
+    
+    
+  }
+  
+  
+}

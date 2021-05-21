@@ -33,11 +33,11 @@ clean.zoning = function(zoning_var, overlay_var, lot_area_var, boro_code, id_var
   
   out_data = data %>%
     dplyr::select(tidyselect::all_of(c(id_var, zoning_var, overlay_var, lot_area_var))) %>% #Select variables
-    dplyr::mutate(zoning = dplyr::case_when(grepl("R1|R2|R3|R4|R5", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R1_R5", #Aggregate zoning districts
-                            grepl("R6|R7|R8|R9|R10", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R6_R10",
-                            grepl("C1|C2", !!as.name(overlay_var)) ~ "C1_C2",
-                            grepl("C4", !!as.name(zoning_var)) ~ "C4",
-                            grepl("/", !!as.name(zoning_var)) ~ "MR")) %>%
+    dplyr::mutate(zoning = dplyr::case_when(grepl("R1|R2|R3|R4|R5", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R1_R5", #Low density residential
+                            grepl("R6|R7|R8|R9|R10", !!as.name(zoning_var)) & !grepl("/", !!as.name(zoning_var)) ~ "R6_R10", #High density residential
+                            grepl("C1|C2", !!as.name(overlay_var)) ~ "C1_C2", #Low density commercial
+                            grepl("C4", !!as.name(zoning_var)) ~ "C4", #High density commercial
+                            grepl("/", !!as.name(zoning_var)) ~ "MR")) %>% #Manufacturing and residential
     dplyr::mutate(zoning = ifelse(is.na(zoning), "other", zoning)) %>% #Create other zoning districts variable
     dplyr::group_by(!!as.name(id_var)) %>%
     dplyr::mutate(total_area = sum(as.numeric(!!as.name(lot_area_var)))) %>% #Calculate total lot area in tract
@@ -48,6 +48,25 @@ clean.zoning = function(zoning_var, overlay_var, lot_area_var, boro_code, id_var
     replace(is.na(.), 0) %>%
     dplyr::rename(GEOID = !!as.name(id_var)) %>%
     dplyr::select(-other) %>%
+    tract.to.geoid(boro_code = boro_code, tract_var = "GEOID", data = .) #Map tract numbers to geoids
+  
+  return(out_data)
+  
+}
+
+clean.districts = function(lot_area_var, grad_var, boro_code, district_var, id_var, district_data, zoning_data) {
+  
+  out_data = zoning_data %>%
+    dplyr::select(tidyselect::all_of(c(lot_area_var, district_var, id_var))) %>% #Select variables
+    dplyr::filter(!is.na(!!as.name(district_var))) %>% #Drop lots missing district assignments
+    dplyr::group_by(!!as.name(id_var)) %>%
+    dplyr::mutate(total_area = sum(as.numeric(!!as.name(lot_area_var)))) %>% #Calculate total lot area in tract
+    dplyr::group_by(!!as.name(id_var), !!as.name(district_var)) %>%
+    dplyr::summarise(dist_area = sum(as.numeric(!!as.name(lot_area_var))/total_area)) %>% #Calculate share of tract area by school district
+    dplyr::ungroup() %>%
+    dplyr::inner_join(district_data, by = district_var) %>% #Join residential data with school district data
+    dplyr::group_by(!!as.name(id_var)) %>% 
+    dplyr::summarize(grad_rate = sum(!!as.name(grad_var)/100 * dist_area)) %>% #Caclulate weighted averge of graduation rates by tract
     tract.to.geoid(boro_code = boro_code, tract_var = "GEOID", data = .) #Map tract numbers to geoids
   
   return(out_data)

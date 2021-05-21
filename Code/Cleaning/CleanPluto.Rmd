@@ -18,11 +18,7 @@ library(magrittr)
 library(readxl)
 library(readr)
 library(tidyverse)
-library(sf)
-library(spData)
-library(tmap)
 library(purrr)
-library(furrr)
 source("Code/Scripts/utils.R")
 ```
 
@@ -45,40 +41,72 @@ pluto_si = read_csv("RawData/pluto/si11v2.txt",
   filter(!is.na(CT2010) & !is.na(ZoneDist1)) 
 ```
 
+```{r}
+#Read in district graduation rate data
+grad_rates = read_excel("RawData/graduation_rates.xlsx", sheet = "All") %>%
+  filter(!!as.name("Cohort Year") == 2007 & Cohort == "4 year June") %>%
+  rename(SchoolDist = District)
+```
+
 #Create Zoning Data
 
-##Brooklyn
-
 ```{r}
-pluto_bk %>%
+#Brooklyn
+zoning_bk = pluto_bk %>%
   clean.zoning(zoning_var = "ZoneDist1", overlay_var = "Overlay1", lot_area_var = "LotArea", boro_code = "047", "CT2010", data = .)
+#Bronx
+zoning_bx = pluto_bx %>%
+  clean.zoning(zoning_var = "ZoneDist1", overlay_var = "Overlay1", lot_area_var = "LotArea", boro_code = "005", "CT2010", data = .)
+#Manhattan
+zoning_mn = pluto_mn %>%
+  clean.zoning(zoning_var = "ZoneDist1", overlay_var = "Overlay1", lot_area_var = "LotArea", boro_code = "061", "CT2010", data = .)
+#Queens
+zoning_qn = pluto_qn %>%
+  clean.zoning(zoning_var = "ZoneDist1", overlay_var = "Overlay1", lot_area_var = "LotArea", boro_code = "081", "CT2010", data = .)
+#Staten Island
+zoning_si = pluto_si %>%
+  clean.zoning(zoning_var = "ZoneDist1", overlay_var = "Overlay1", lot_area_var = "LotArea", boro_code = "085", "CT2010", data = .)
 ```
 
 #Clean School District Data
 
 ```{r}
-grad = read_excel("RawData/graduation_rates.xlsx", sheet = "All") %>%
-  filter(!!as.name("Cohort Year") == 2007 & Cohort == "4 year June") %>%
-  rename(SchoolDist = District)
+#Brooklyn
+grad_rates_bk = pluto_bk %>%
+  rename(GEOID = CT2010) %>%
+  clean.districts("LotArea", "% Grads", "047", "SchoolDist", "GEOID", grad_rates, .)
+#Bronx
+grad_rates_bx = pluto_bx %>%
+  rename(GEOID = CT2010) %>%
+  clean.districts("LotArea", "% Grads", "005", "SchoolDist", "GEOID", grad_rates, .)
+#Manhattan
+grad_rates_mn = pluto_mn %>%
+  rename(GEOID = CT2010) %>%
+  clean.districts("LotArea", "% Grads", "061", "SchoolDist", "GEOID", grad_rates, .)
+#Queens
+grad_rates_qn = pluto_qn %>%
+  rename(GEOID = CT2010) %>%
+  clean.districts("LotArea", "% Grads", "081", "SchoolDist", "GEOID", grad_rates, .)
+#Staten Island
+grad_rates_si = pluto_si %>%
+  rename(GEOID = CT2010) %>%
+  clean.districts("LotArea", "% Grads", "085", "SchoolDist", "GEOID", grad_rates, .)
+```
+
+#Join and Write Data
+
+```{r}
+pluto_data = inner_join(zoning_bk, grad_rates_bk, by = "GEOID") %>%
+  bind_rows(inner_join(zoning_bx, grad_rates_bx, by = "GEOID")) %>%
+  bind_rows(inner_join(zoning_mn, grad_rates_mn, by = "GEOID")) %>%
+  bind_rows(inner_join(zoning_qn, grad_rates_qn, by = "GEOID")) %>%
+  bind_rows(inner_join(zoning_si, grad_rates_si, by = "GEOID")) 
 ```
 
 ```{r}
-grad
+write_csv(pluto_data, "CleanData/pluto_data.csv")
 ```
 
-```{r}
-pluto_bk %>%
-  filter(grepl("R", ZoneDist1) & !grepl("PARK", ZoneDist1)) %>%
-  filter(!is.na(SchoolDist)) %>%
-  select(-ZoneDist1, -Overlay1) %>%
-  group_by(CT2010) %>%
-  mutate(total_area = sum(as.numeric(LotArea))) %>%
-  group_by(CT2010, SchoolDist) %>%
-  summarise(dist_area = sum(as.numeric(LotArea)/total_area)) %>%
-  ungroup() %>%
-  inner_join(grad, by = "SchoolDist") %>%
-  group_by(CT2010) %>%
-  summarize(grad_rate = sum(!!as.name("% Grads")/100 * dist_area))
-```
+
 
 

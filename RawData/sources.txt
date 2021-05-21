@@ -5,10 +5,14 @@
 *ACS_raw.csv: 2007-2011 and 2014-2018 American Community Survey data
 *ARCHIVED - Parks Properties: Shapefile of parks owned by the City of New York
 	https://data.cityofnewyork.us/City-Government/ARCHIVED-Parks-Properties/k2ya-ucmv
+*arrests.csv: geocoded arrest data
+	https://data.cityofnewyork.us/Public-Safety/NYPD-Arrests-Data-Historic-/8h9b-rp9u
 *Boundaries: Census tract boundaries Shapefile
 *cbd.csv: Obtained from Daniel Hartley @ Federal Reserve Bank of Chicago
 *graduation_rates.xlsx: High school graduation rates by public school district
 	https://infohub.nyced.org/reports/academics/graduation-results
+*housing_violations.csv: Housing maintenance violations for rental properties
+	https://data.cityofnewyork.us/Housing-Development/Housing-Maintenance-Code-Violations/wvxf-dwi5
 *ltdb_dp.xlsx: Longitudinal Tract Database-Differential Privacy for 2000 Census
 	https://s4.ad.brown.edu/projects/diversity/researcher/LTDB.htm
 *NYC_BICYCLE_NETWORK_18D_20200214_p: Shapefile of bike lanes in New York City

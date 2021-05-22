@@ -51,18 +51,19 @@ violations_shp = violations_2011 %>%
 ```
 
 ```{r}
-violations_data = st_intersection(nyc_shp, violations_shp)
-```
-
-```{r}
-violations_data %>%
+violations_data = st_intersection(nyc_shp, violations_shp) %>%
   st_drop_geometry() %>%
   group_by(GEOID, Class) %>%
-  summarize(d_violations = n()/tract_area) %>%
-  distinct()
+  summarize(n_violations = n()) %>%
+  spread(key = "Class", value = "n_violations") %>%
+  rename(class_a = A, class_b = B, class_c = C)
 ```
 
+#Write Violations Data
+
 ```{r}
-violations_data
+write_csv(violations_data, "CleanData/violations.csv")
 ```
+
+
 

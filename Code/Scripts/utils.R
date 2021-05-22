@@ -193,7 +193,7 @@ aggregate.permits = function(tract, tracts_shp, id_var, permits_shp) {
   
 }
 
-spatial.aggregate = function(unit_id, unit_var, units_shp, aggregate_shp, aggregation_type) {
+spatial.aggregate = function(unit_id, unit_var, units_shp, aggregate_shp, aggregation_type, newvar_name, normalize = FALSE) {
   
   #Readme: This function takes in a single unit id from a shapefile with multiple units as well as
   #shapefile with point, line, or polygon features to aggregate according to some aggregation
@@ -203,7 +203,7 @@ spatial.aggregate = function(unit_id, unit_var, units_shp, aggregate_shp, aggreg
   #Check that the given aggregation type is valid
   if (!aggregation_type %in% c("intersection")) {
     
-    stop(paste(aggregation_type, "is not a valid aggregation type", sep = ""))
+    stop(paste(aggregation_type, "is not a valid aggregation type", sep = " "))
     
   }
   
@@ -213,12 +213,25 @@ spatial.aggregate = function(unit_id, unit_var, units_shp, aggregate_shp, aggreg
   
   if (aggregation_type == "intersection") {
     
-    #The intersection option aggregates features by taking the intersection of the unit shapefie 
+    #The intersection option aggregates features by taking the intersection of the unit shapefile 
     #and the feature shapefile
+    out_data = sf::st_intersection(unit_shp, aggregate_shp) %>%
+      sf::st_drop_geometry() %>%
+      dplyr::summarize(!!as.name(newvar_name) := dplyr::n()) %>%
+      dplyr::mutate(GEOID = as.character(unit_id))
+
+  }
+  
+  #Optional: normalize aggregate variable by unit area
+  if (isTRUE(normalize)) {
     
+    unit_area = clean.units(sf::st_area(unit_shp))*3.58701e-8
     
+    out_data = out_data %>%
+      dplyr::mutate(!!as.name(newvar_name) := !!as.name(newvar_name) / unit_area)
     
   }
   
+  return(out_data)
   
 }

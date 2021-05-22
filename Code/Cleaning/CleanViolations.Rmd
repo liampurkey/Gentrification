@@ -32,17 +32,37 @@ source("Code/Scripts/utils.R")
 violations = fread("RawData/housing_violations.csv")
 ```
 
+```{r}
+#Read in tract shapefile
+nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
+  st_transform(2263)
+```
+
 #Clean Violations Data
 
 ```{r}
-violations_2011 = violations[grepl("2011", InspectionDate) & Class != "I"]
+violations_2011 = violations[grepl("2011", InspectionDate) & Class != "I" & !(is.na(Latitude) | is.na(Longitude)), .(Class, Latitude, Longitude)]
 ```
 
 ```{r}
-violations_2011 %>%
-  group_by(Borough, CensusTract, Class) %>%
-  summarize(n_violations = n())
+violations_shp = violations_2011 %>%
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4269) %>%
+  st_transform(2263)
 ```
 
+```{r}
+violations_data = st_intersection(nyc_shp, violations_shp)
+```
 
+```{r}
+violations_data %>%
+  st_drop_geometry() %>%
+  group_by(GEOID, Class) %>%
+  summarize(d_violations = n()/tract_area) %>%
+  distinct()
+```
+
+```{r}
+violations_data
+```
 

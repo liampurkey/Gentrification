@@ -117,21 +117,6 @@ clean.units <- function(x){
   x
 }
 
-aggregate.lines = function(tract, tracts_shp, id_var, lines_shp, line_var) {
-  
-  tract_shp = tracts_shp %>%
-    dplyr::filter(!!as.name(id_var) == tract)
-  
-  nearby_lines = cbind(lines_shp, distance = clean.units(st_distance(lines_shp, tract_shp))*0.000621371) %>%
-    dplyr::filter(distance <= 0.5) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::distinct(!!as.name(line_var)) %>%
-    dplyr::summarize(n_lines = n()) %>%
-    mutate(GEOID = as.character(tract))
-  
-  return(nearby_lines)
-  
-}
 
 aggregate.trees = function(tract, tracts_shp, id_var, trees_shp) {
   

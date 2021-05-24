@@ -30,12 +30,12 @@ source("Code/Scripts/utils.R")
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area) %>%
-  st_transform(4269)
+  st_transform(2263)
 ```
 
 ```{r}
 #Read in subway stop data
-subway_data = read_csv("RawData/station_entrances.csv")
+subway_data = read_csv("RawData/station_entrances.csv") 
 ```
 
 #Prepare Data
@@ -43,22 +43,29 @@ subway_data = read_csv("RawData/station_entrances.csv")
 ```{r}
 #Create subway shapefile
 subway_shp = subway_data %>%
-  gather(ID, Line, Route_1:Route_11) %>%
-  filter(!is.na(Line)) %>% 
+  gather(ID, Line, Route_1:Route_11) %>% #Create long data with station-line pairs
+  filter(!is.na(Line)) %>% #Drop NA lines
   select(-ID, -Station_Name) %>%
-  distinct() %>%
-  st_as_sf(coords = c("Station_Longitude", "Station_Latitude"), crs = 4269)
+  distinct() %>% #Drop entries with multiple entries to same station
+  st_as_sf(coords = c("Station_Longitude", "Station_Latitude"), crs = 4269) %>% #Create shapefile with NAD83 Datum
+  st_transform(2263) #Transform to NAD83 / New York Long Island 
 ```
 
 ```{r}
-#Create tract centroids
-nyc_centroids = st_centroid(nyc_shp)
+#Create buffers
+nyc_buffer = st_buffer(st_centroid(nyc_shp), dist = 2640)
 ```
 
 #Create Subway Count Data
 
 ```{r}
-subway_counts = map_dfr(nyc_centroids$GEOID, aggregate_lines, tracts_shp = nyc_centroids, id_var = "GEOID", lines = subway_shp, line_var = "Line")
+subway_counts = st_intersection(nyc_buffer, subway_shp) %>%
+  st_drop_geometry() %>%
+  distinct(GEOID, Line) %>%
+  group_by(GEOID) %>%
+  summarize(n_lines = n()) %>%
+  right_join(nyc_shp %>% st_drop_geometry(), by = "GEOID") %>%
+  mutate(n_lines = ifelse(is.na(n_lines), 0, n_lines))
 ```
 
 #Write Data

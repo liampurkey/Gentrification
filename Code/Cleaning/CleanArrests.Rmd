@@ -1,0 +1,65 @@
+---
+title: "Clean NYPD Arrests Data"
+author: "Liam Purkey"
+date: "5/24/2021"
+output: html_document
+---
+
+#Setup File
+
+```{r, setup, include=FALSE}
+#Change root directory
+knitr::opts_knit$set(root.dir = "/Users/liampurkey/Desktop/Research/Gentrification")
+```
+
+```{r}
+#Load packages
+library(magrittr)
+library(readxl)
+library(readr)
+library(tidyverse)
+library(data.table)
+library(sf)
+library(spData)
+library(tmap)
+library(purrr)
+source("Code/Scripts/utils.R")
+```
+
+```{r}
+#Read in tract shapefile
+nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
+  st_transform(2263)
+```
+
+```{r}
+#Read in parks shapefile
+arrests = fread("RawData/arrests.csv")
+```
+
+#Prepare Data
+
+```{r}
+arrests_2011 = arrests[!is.na(Latitude) & !is.na(Longitude), .(ARREST_DATE, OFNS_DESC, LAW_CAT_CD, Latitude, Longitude)
+        ][,c("month", "day", "year") := tstrsplit(ARREST_DATE, "/", fixed=TRUE)
+            ][year == "2011" 
+              & (grepl("FELONY ASSAULT|HOMICIDE|MANSLAUGHTER|MURDER|RAPE|ROBBERY", OFNS_DESC) | grepl("BURGLARY", OFNS_DESC) | grepl("DANGEROUS WEAPONS|DRUGS|PROSTITUTION", OFNS_DESC)) 
+              ][, crime_type := fcase(grepl("FELONY ASSAULT|HOMICIDE|MANSLAUGHTER|MURDER|RAPE|ROBBERY", OFNS_DESC), "violent",
+                                grepl("BURGLARY", OFNS_DESC), "property",
+                                grepl("DANGEROUS WEAPONS|DRUGS|PROSTITUTION", OFNS_DESC), "consensual")
+                ][, c("ARREST_DATE", "OFNS_DESC", "month", "day", "year") := NULL]
+```
+
+```{r}
+arrests_2011_shp = arrests_2011 %>%
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4269) %>%
+  st_transform(2263)
+```
+
+
+
+
+
+
+
+

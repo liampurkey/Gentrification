@@ -35,6 +35,7 @@ violations = fread("RawData/housing_violations.csv")
 ```{r}
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
+  select(-tract_area) %>%
   st_transform(2263)
 ```
 

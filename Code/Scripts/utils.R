@@ -133,34 +133,6 @@ aggregate.lines = function(tract, tracts_shp, id_var, lines_shp, line_var) {
   
 }
 
-aggregate.lanes = function(tract, tracts_shp, id_var, lanes_shp) {
-  
-  tract_shp = tracts_shp %>%
-    dplyr::filter(!!as.name(id_var) == tract)
-  
-  nearby_lanes = st_intersection(st_buffer(tract_shp, dist = 2640), lanes_shp) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::summarize(n_lanes = n()) %>%
-    mutate(GEOID = as.character(tract))
-  
-  return(nearby_lanes)
-  
-}
-
-aggregate.parks = function(tract, tracts_shp, id_var, parks_shp) {
-  
-  tract_shp = tracts_shp %>%
-    dplyr::filter(!!as.name(id_var) == tract)
-  
-  nearby_parks = st_intersection(st_buffer(tract_shp, dist = 2640), parks_shp, 0) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::summarize(n_parks = n()) %>%
-    mutate(GEOID = as.character(tract))
-  
-  return(nearby_parks)
-  
-}
-
 aggregate.trees = function(tract, tracts_shp, id_var, trees_shp) {
   
   tract_shp = tracts_shp %>%

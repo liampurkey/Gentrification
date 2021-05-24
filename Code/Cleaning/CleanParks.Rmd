@@ -43,14 +43,19 @@ parks_shp = st_read("RawData/ARCHIVED\ -\ Parks\ Properties/geo_export_305578e7-
 #Prepare Data
 
 ```{r}
-#Create centroids
-nyc_centroids = st_transform(st_centroid(nyc_shp), 2263)
+#Create buffers
+nyc_buffer = st_buffer(st_centroid(nyc_shp), dist = 2640)
 ```
 
-#Clean Data
+#Create Intersection Data 
 
 ```{r}
-park_counts = map_dfr(nyc_centroids$GEOID, aggregate_parks, tracts_shp = nyc_centroids, id_var = "GEOID", parks_shp = parks_shp)
+park_counts = st_intersection(nyc_buffer, parks_shp) %>%
+  st_drop_geometry() %>%
+  group_by(GEOID) %>%
+  summarize(n_parks = n()) %>% 
+  right_join(nyc_shp %>% st_drop_geometry(), by = "GEOID") %>%
+  mutate(n_parks = ifelse(is.na(n_parks), 0, n_parks))
 ```
 
 #Write Data

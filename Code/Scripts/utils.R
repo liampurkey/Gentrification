@@ -118,21 +118,7 @@ clean.units <- function(x){
 }
 
 
-aggregate.trees = function(tract, tracts_shp, id_var, trees_shp) {
-  
-  tract_shp = tracts_shp %>%
-    dplyr::filter(!!as.name(id_var) == tract)
-  
-  tract_area = clean.units(st_area(tract_shp))*3.86102e-7
-  
-  tract_trees = st_intersection(tract_shp, trees_shp) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::summarize(d_trees = n() / tract_area) %>%
-    mutate(GEOID = as.character(tract))
-  
-  return(tract_trees)
-  
-}
+
 
 aggregate.permits = function(tract, tracts_shp, id_var, permits_shp) {
   
@@ -150,45 +136,3 @@ aggregate.permits = function(tract, tracts_shp, id_var, permits_shp) {
   
 }
 
-spatial.aggregate = function(unit_id, unit_var, units_shp, aggregate_shp, aggregation_type, newvar_name, normalize = FALSE) {
-  
-  #Readme: This function takes in a single unit id from a shapefile with multiple units as well as
-  #shapefile with point, line, or polygon features to aggregate according to some aggregation
-  #criterion. The function can then be passed to a mapping function such as purrr::map_dfr to aggregate
-  #the feature of interest for all units in the data set.
-  
-  #Check that the given aggregation type is valid
-  if (!aggregation_type %in% c("intersection")) {
-    
-    stop(paste(aggregation_type, "is not a valid aggregation type", sep = " "))
-    
-  }
-  
-  #Select unit from set of units
-  unit_shp = units_shp %>%
-    dplyr::filter(!!as.name(unit_var) == unit_id)
-  
-  if (aggregation_type == "intersection") {
-    
-    #The intersection option aggregates features by taking the intersection of the unit shapefile 
-    #and the feature shapefile
-    out_data = sf::st_intersection(unit_shp, aggregate_shp) %>%
-      sf::st_drop_geometry() %>%
-      dplyr::summarize(!!as.name(newvar_name) := dplyr::n()) %>%
-      dplyr::mutate(GEOID = as.character(unit_id))
-
-  }
-  
-  #Optional: normalize aggregate variable by unit area
-  if (isTRUE(normalize)) {
-    
-    unit_area = clean.units(sf::st_area(unit_shp))*3.58701e-8
-    
-    out_data = out_data %>%
-      dplyr::mutate(!!as.name(newvar_name) := !!as.name(newvar_name) / unit_area)
-    
-  }
-  
-  return(out_data)
-  
-}

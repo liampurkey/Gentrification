@@ -29,6 +29,7 @@ source("Code/Scripts/utils.R")
 ```{r}
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
+  select(-tract_area) %>%
   st_transform(2263)
 ```
 
@@ -56,7 +57,24 @@ arrests_2011_shp = arrests_2011 %>%
   st_transform(2263)
 ```
 
+#Aggregate Arrests to Census Tracts
 
+```{r}
+crime_counts = st_intersection(nyc_shp, arrests_2011_shp) %>%
+  st_drop_geometry() %>%
+  group_by(GEOID, crime_type) %>%
+  summarize(n_crimes = n()) %>%
+  ungroup() %>%
+  spread(key = "crime_type", value = "n_crimes") %>%
+  right_join(nyc_shp %>% st_drop_geometry(), by = "GEOID") %>%
+  replace(is.na(.), 0)
+```
+
+#Write Data
+
+```{r}
+write_csv(crime_counts, "CleanData/crime_counts.csv")
+```
 
 
 

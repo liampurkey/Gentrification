@@ -120,19 +120,4 @@ clean.units <- function(x){
 
 
 
-aggregate.permits = function(tract, tracts_shp, id_var, permits_shp) {
-  
-  tract_shp = tracts_shp %>%
-    dplyr::filter(!!as.name(id_var) == tract)
-  
-  tract_area = clean.units(st_area(tract_shp))*3.86102e-7
-  
-  tract_permits = st_intersection(tract_shp, permits_shp) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::summarize(d_permits = n() / tract_area) %>%
-    mutate(GEOID = as.character(tract))
-  
-  return(tract_permits)
-  
-}
 

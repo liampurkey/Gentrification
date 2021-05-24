@@ -29,21 +29,21 @@ source("Code/Scripts/utils.R")
 ```{r}
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
-  select(-tract_area) %>%
-  st_transform(4269)
+  st_transform(2263)
 ```
 
 ```{r}
 #Read in permit data 
-permits_shp = read_csv("RawData/permit_issuances.csv")%>%
-  select(Residential, "Filing Date", LATITUDE, LONGITUDE) %>%
+permits_shp = read_csv("RawData/permit_issuances.csv")  %>%
+  select(Residential, "Filing Date", LATITUDE, LONGITUDE) %>% 
   filter(Residential == "YES") %>%
   rename(latitude = LATITUDE) %>%
   rename(longitude = LONGITUDE) %>%
   separate(!!as.name("Filing Date"), into = c("month", "day", "year"), sep = "/") %>%
   select(-month, -day, -Residential) %>%
   filter(!is.na(longitude) & !is.na(latitude)) %>%
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4269)
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4269) %>%
+  st_transform(2263)
 #Create 2011 permit data
 permits_2011_shp = permits_shp %>%
   filter(year == 11)
@@ -54,15 +54,27 @@ permits_2011_shp = permits_shp %>%
 ##2011
 
 ```{r}
-permit_counts_2011 = map_dfr(nyc_shp$GEOID, aggregate_permits, tracts_shp = nyc_shp, 
-                             id_var = "GEOID", permits_shp = permits_2011_shp) %>%
-  rename(d_permits_2011 = d_permits)
+permit_counts_2011 = st_intersection(nyc_shp, permits_2011_shp %>% select(geometry)) %>%
+  st_drop_geometry() %>%
+  group_by(GEOID) %>%
+  summarize(d_permits_2011 = n() / tract_area) %>%
+  ungroup() %>%
+  distinct() %>%
+  right_join(nyc_shp %>% st_drop_geometry() %>% select(GEOID), by = "GEOID") %>%
+  mutate(d_permits_2011 = ifelse(is.na(d_permits_2011), 0, d_permits_2011)) 
 ```
 
 ##2009-2011
 
 ```{r}
-permit_counts = map_dfr(nyc_shp$GEOID, aggregate_permits, tracts_shp = nyc_shp, id_var = "GEOID", permits_shp = permits_shp) 
+permit_counts = st_intersection(nyc_shp, permits_shp %>% select(geometry)) %>%
+  st_drop_geometry() %>%
+  group_by(GEOID) %>%
+  summarize(d_permits= n() / tract_area) %>%
+  ungroup() %>%
+  distinct() %>%
+  right_join(nyc_shp %>% st_drop_geometry() %>% select(GEOID), by = "GEOID") %>%
+  mutate(d_permits = ifelse(is.na(d_permits), 0, d_permits)) 
 ```
 
 #Join and Write Data

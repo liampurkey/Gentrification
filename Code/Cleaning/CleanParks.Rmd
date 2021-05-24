@@ -61,7 +61,7 @@ park_counts = st_intersection(nyc_buffer, parks_shp) %>%
 #Write Data
 
 ```{r}
-write_csv(park_counts, "CleanData/park_counts")
+write_csv(park_counts, "CleanData/park_counts.csv")
 ```
 
 

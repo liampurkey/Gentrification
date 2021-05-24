@@ -47,18 +47,24 @@ bikelanes_shp = segment_data %>%
   separate(instdate, into = c("year", "month", "time"), sep = "-") %>%
   filter(year <= 2011) %>%
   group_by(fromstreet, tostreet) %>%
-  summarize(geometry = st_union(geometry))
+  summarize(geometry = st_union(geometry)) %>%
+  ungroup()
 ```
 
 ```{r}
 #Create centroids
-nyc_centroids = st_transform(st_centroid(nyc_shp), 2263)
+nyc_buffer = st_buffer(st_centroid(nyc_shp), dist = 2640)
 ```
 
 #Create Intersection Data
 
 ```{r}
-lane_counts = map_dfr(nyc_centroids$GEOID, aggregate_lanes, tracts_shp = nyc_centroids, id_var = "GEOID", lanes_shp = bikelanes_shp)
+lane_counts = st_intersection(nyc_buffer, bikelanes_shp) %>%
+  st_drop_geometry() %>%
+  group_by(GEOID) %>%
+  summarize(n_lanes = n()) %>% 
+  right_join(nyc_shp %>% st_drop_geometry(), by = "GEOID") %>%
+  mutate(n_lanes = ifelse(is.na(n_lanes), 0, n_lanes))
 ```
 
 #Write Data

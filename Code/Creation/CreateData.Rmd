@@ -50,7 +50,7 @@ input_data = acs_data %>%
   group_by(GEOID) %>%
   mutate(diff_p_college_pop = lead(p_college_pop, order_by = year) - p_college_pop) %>% 
   ungroup() %>%
-  filter(year == 2011) %>%
+  filter(year == 2011 & !grepl("085", GEOID)) %>%
   inner_join(ltdb_data, by = "GEOID") %>% 
   mutate(pre_p_college_pop = p_college_pop - p_college_pop_2000) %>%
   select(GEOID, medianincome, diff_p_college_pop, pre_p_college_pop)

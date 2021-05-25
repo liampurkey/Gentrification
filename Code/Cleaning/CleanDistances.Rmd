@@ -32,7 +32,12 @@ source("Code/Scripts/utils.R")
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area) %>%
-  st_transform(2263)
+  st_transform(2263) %>%
+  inner_join(
+    get_acs(geography = "tract", variables = c(medianincome = "B19013_001"), state = "NY", county = c("Bronx", "Kings", "New York", "Queens", "Richmond"), year = 2011, geometry = FALSE) %>%
+      select(-NAME, -moe) %>%
+  spread(key = "variable", value = "estimate"), by = "GEOID")
+  
 ```
 
 ```{r}
@@ -52,10 +57,28 @@ dist_cbds = as.data.frame(clean.units(st_distance(nyc_shp, cbds) / 5280)) %>%
   cbind(GEOID = nyc_shp$GEOID)
 ```
 
-#Write Data
+#Calculate High Income Neighborhoods and Distance to those Neighborhoods
 
 ```{r}
-write_csv(dist_cbds, "CleanData/distance_cbds.csv")
+high_income_tracts = nyc_shp %>%
+  filter(!grepl("085", GEOID)) %>% 
+  filter(ifelse(medianincome > quantile(medianincome, probs = 0.80, na.rm = TRUE), 1, 0) == 1) %>%
+  select(-medianincome)
+```
+
+```{r}
+dist_hi = as.data.frame(cbind(GEOID = nyc_shp$GEOID, dist_hi = apply(clean.units(st_distance(nyc_shp, high_income_tracts))/5280,1, min))) %>%
+  mutate(dist_hi = as.numeric(dist_hi))
+```
+
+#Join and Write Data
+
+```{r}
+dist_data = inner_join(dist_cbds, dist_hi, by = "GEOID")
+```
+
+```{r}
+write_csv(dist_data, "CleanData/distance_data.csv")
 ```
 
 

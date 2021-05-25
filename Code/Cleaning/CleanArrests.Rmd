@@ -71,7 +71,7 @@ crime_counts = st_intersection(nyc_shp, arrests_2011_shp) %>%
   ungroup() %>%
   distinct(GEOID, crime_type, crimes_pc) %>%
   spread(key = "crime_type", value = "crimes_pc") %>%
-  right_join(nyc_shp %>% st_drop_geometry(), by = "GEOID") %>%
+  right_join(nyc_shp %>% st_drop_geometry() %>% select(GEOID), by = "GEOID") %>%
   replace(is.na(.), 0)
 ```
 
@@ -80,6 +80,7 @@ crime_counts = st_intersection(nyc_shp, arrests_2011_shp) %>%
 ```{r}
 write_csv(crime_counts, "CleanData/crime_counts.csv")
 ```
+
 
 
 

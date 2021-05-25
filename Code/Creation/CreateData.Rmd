@@ -98,7 +98,7 @@ es_data = wac_data %>%
   inner_join(pluto_data, by = "GEOID") %>%
   inner_join(subway_counts, by = "GEOID") %>%
   inner_join(tree_density, by = "GEOID") %>%
-  inner_join(violations, by = "GEOID") 
+  inner_join(violations, by = "GEOID") %>%
   mutate(gentrify = ifelse(year <= 2011, 0, gentrify)) 
 ```
 
@@ -113,7 +113,16 @@ summary_data = acs_data %>%
   mutate(across(starts_with("d_"), ~(lead(.x, order_by = year) - .x)/.x, .names = "pc_{.col}")) %>%
   mutate(across(c(medianhomevalue, medianincome, medianrent, pop), ~(lead(.x, order_by = year) - .x)/.x, .names = "pc_{.col}")) %>%
   ungroup() %>%
-  filter(year == 2011)
+  filter(year == 2011) %>%
+  inner_join(crime_counts, by = "GEOID") %>%
+  inner_join(dist_cbds, by = "GEOID") %>%
+  inner_join(lane_counts, by = "GEOID") %>%
+  inner_join(park_counts, by = "GEOID") %>%
+  inner_join(permit_density, by = "GEOID") %>%
+  inner_join(pluto_data, by = "GEOID") %>%
+  inner_join(subway_counts, by = "GEOID") %>%
+  inner_join(tree_density, by = "GEOID") %>%
+  inner_join(violations, by = "GEOID")
 ```
 
 #Write Data

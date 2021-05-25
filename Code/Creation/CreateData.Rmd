@@ -125,13 +125,34 @@ summary_data = acs_data %>%
   inner_join(violations, by = "GEOID")
 ```
 
-#Write Data
+#Write Data and Codebook
 
 ```{r}
 write_csv(dd_data, "CleanData/Main/dd_data.csv") #Difference in differences data
 write_csv(es_data, "CleanData/Main/es_data.csv") #Event study data
 write_csv(summary_data, "CleanData/Main/summary_data.csv") #summary statistics data
 ```
+
+```{r}
+codebook = sort(names(dd_data)) %>%
+  as.data.frame() %>%
+  rename("variable" = ".")
+
+if (!file.exists("CleanData/codebook.csv")) {
+  
+  write_csv(codebook, "CleanData/codebook.csv")
+  
+} else if (file.exists("CleanData/codebook.csv")) {
+  
+  current_codebook = read_csv("CleanData/codebook.csv")
+  updated_codebook = full_join(current_codebook, codebook, by = "variable")
+  
+  write_csv(updated_codebook, "CleanData/codebook.csv")
+  
+}
+```
+
+
 
 
 

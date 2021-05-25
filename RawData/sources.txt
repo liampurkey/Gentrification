@@ -18,6 +18,8 @@
 *NYC_BICYCLE_NETWORK_18D_20200214_p: Shapefile of bike lanes in New York City
 	https://data.cityofnewyork.us/Transportation/Bicycle-Routes/7vsa-caz7
 	archived_nyc_bike_routes_2010.zip
+*nynta_21b: New York City neighborhood tabulation area shapefile
+	https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-nynta.page
 *permit_issuances: construction permits issued by the department of buildings for the 2009-2011 period
 	https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a/data
 *pluto: Extensive land use and geographic data at the tax lot level

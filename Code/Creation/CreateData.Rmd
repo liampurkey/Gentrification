@@ -24,10 +24,21 @@ source("Code/Scripts/utils.R")
 ```
 
 ```{r}
-#Read in data used to create gentrification indicator
+#Read in data 
+##Demographic and employment data
 acs_data = read_csv("CleanData/ACS_clean.csv", col_types = cols(GEOID = col_character())) 
 ltdb_data = read_csv("CleanData/LTDB_clean.csv", col_types = cols(GEOID = col_character()))
 wac_data = read_csv("CleanData/WAC_clean.csv", col_types = cols(GEOID = col_character()))
+##New York City open data
+crime_counts = read_csv("CleanData/crime_counts.csv", col_types = cols(GEOID = col_character()))
+dist_cbds = read_csv("CleanData/distance_cbds.csv", col_types = cols(GEOID = col_character()))
+lane_counts = read_csv("CleanData/lane_counts.csv", col_types = cols(GEOID = col_character()))
+park_counts = read_csv("CleanData/park_counts.csv", col_types = cols(GEOID = col_character()))
+permit_density = read_csv("CleanData/permit_density.csv", col_types = cols(GEOID = col_character()))
+pluto_data = read_csv("CleanData/pluto_data.csv", col_types = cols(GEOID = col_character()))
+subway_counts = read_csv("CleanData/subway_counts.csv", col_types = cols(GEOID = col_character()))
+tree_density = read_csv("CleanData/tree_density.csv", col_types = cols(GEOID = col_character()))
+violations = read_csv("CleanData/violations.csv", col_types = cols(GEOID = col_character()))
 ```
 
 #Encode Gentrification
@@ -61,7 +72,16 @@ gen_data = create.gentrification(income_var = "medianincome", college_var = "dif
 dd_data = wac_data %>%
   filter(year == 2011 | year == 2018) %>%
   inner_join(gen_data, by = "GEOID") %>%
-  inner_join(acs_data %>% filter(year == 2011) %>% select(-year), by = "GEOID")
+  inner_join(acs_data %>% filter(year == 2011) %>% select(-year), by = "GEOID") %>%
+  inner_join(crime_counts, by = "GEOID") %>%
+  inner_join(dist_cbds, by = "GEOID") %>%
+  inner_join(lane_counts, by = "GEOID") %>%
+  inner_join(park_counts, by = "GEOID") %>%
+  inner_join(permit_density, by = "GEOID") %>%
+  inner_join(pluto_data, by = "GEOID") %>%
+  inner_join(subway_counts, by = "GEOID") %>%
+  inner_join(tree_density, by = "GEOID") %>%
+  inner_join(violations, by = "GEOID") 
 ```
 
 ##Create Event Study Data

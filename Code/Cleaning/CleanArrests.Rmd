@@ -30,7 +30,11 @@ source("Code/Scripts/utils.R")
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area) %>%
-  st_transform(2263)
+  st_transform(2263) %>%
+  inner_join(
+    get_acs(geography = "tract", variables = c(pop = "B01003_001"), state = "NY", county = c("Bronx", "Kings", "New York", "Queens", "Richmond"), year = 2011, geometry = FALSE) %>%
+      select(-NAME, -moe) %>%
+  spread(key = "variable", value = "estimate"), by = "GEOID")
 ```
 
 ```{r}

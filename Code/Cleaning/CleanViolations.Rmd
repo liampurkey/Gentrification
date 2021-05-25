@@ -18,6 +18,7 @@ library(magrittr)
 library(readxl)
 library(readr)
 library(tidyverse)
+library(tidycensus)
 library(sf)
 library(spData)
 library(tmap)
@@ -36,7 +37,18 @@ violations = fread("RawData/housing_violations.csv")
 #Read in tract shapefile
 nyc_shp = st_read("RawData/Boundaries/NewYork.shp") %>%
   select(-tract_area) %>%
-  st_transform(2263)
+  st_transform(2263) %>%
+  inner_join(
+    get_acs(geography = "tract", variables = c(renter_pop = "B25026_009"), state = "NY", county = c("Bronx", "Kings", "New York", "Queens", "Richmond"), year = 2011, geometry = FALSE) %>%
+      select(-NAME, -moe) %>%
+  spread(key = "variable", value = "estimate"), by = "GEOID")
+```
+
+```{r}
+#Read in ACS population data
+pop_2011 = get_acs(geography = "tract", variables = c(pop = "B01003_001"), state = "NY", county = c("Bronx", "Kings", "New York", "Queens", "Richmond"), year = 2011, geometry = FALSE) %>%
+  select(-NAME, -moe) %>%
+  spread(key = "variable", value = "estimate")
 ```
 
 #Clean Violations Data
@@ -55,9 +67,13 @@ violations_shp = violations_2011 %>%
 violations_data = st_intersection(nyc_shp, violations_shp) %>%
   st_drop_geometry() %>%
   group_by(GEOID, Class) %>%
-  summarize(n_violations = n()) %>%
-  spread(key = "Class", value = "n_violations") %>%
-  rename(class_a = A, class_b = B, class_c = C)
+  summarize(violations_pc = n()/renter_pop) %>%
+  ungroup() %>%
+  distinct(GEOID, Class, violations_pc) %>%
+  spread(key = "Class", value = "violations_pc") %>%
+  rename(class_a = A, class_b = B, class_c = C) %>%
+  right_join(nyc_shp %>% st_drop_geometry() %>% select(GEOID), by = "GEOID") %>%
+  replace(is.na(.), 0)
 ```
 
 #Write Violations Data

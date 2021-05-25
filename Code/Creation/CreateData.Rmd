@@ -144,13 +144,14 @@ if (!file.exists("CleanData/codebook.csv")) {
   
 } else if (file.exists("CleanData/codebook.csv")) {
   
-  current_codebook = read_csv("CleanData/codebook.csv")
+  current_codebook = read_csv("CleanData/codebook.csv", col_types = cols(.default = "c"))
   updated_codebook = full_join(current_codebook, codebook, by = "variable")
   
   write_csv(updated_codebook, "CleanData/codebook.csv")
   
 }
 ```
+
 
 
 

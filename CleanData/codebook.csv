@@ -1,14 +1,14 @@
-variable,description,source
-Borough,,
-C1_C2,,
-C4,,
-class_a,,
-class_b,,
-class_c,,
-consensual,,
-d_permits,,
-d_permits_2011,,
-d_trees,,
+variable,description,variable creation filename (in Code/Cleaning directory)
+Borough,Borough that census tract is located in,
+C1_C2,Share of total tract tax lot area that has C1 or C2 (low-density commercial) zoning designation,CleanPluto
+C4,Share of total tract tax lot area that has C4 (medium-density commercial) zoning designation,CleanPluto
+class_a,Number of class A rental conditions violations (least severe) per tract renter population ,CleanViolation
+class_b,Number of class B rental conditions violations (second-most severe) per tract renter population ,CleanViolation
+class_c,Number of class C rental conditions violations (most severe) per tract renter population ,CleanViolation
+consensual,"Number of arrests per capita for ""consensual"" crimes (dangerous drugs-related, dangerous weapons-related, prostitution-related)",CleanArrests
+d_permits,Number of permits issued by the department of buildings for new residential construction per square mile (2009-2011 period),CleanPermits
+d_permits_2011,Number of permits issued by the department of buildings for new residential construction per square mile (2011 only),CleanPermits
+d_trees,Number of healthy trees per square mile as of the 2005 census of trees,CleanTrees 
 d_w_administrative,,
 d_w_arts,,
 d_w_asian,,
@@ -35,8 +35,8 @@ d_w_storage,,
 d_w_total,,
 d_w_trade,,
 d_w_white,,
-dist_downtown,,
-dist_midtown,,
+dist_downtown,Distance to the centroid of the Battery Park City-Lower Manhattan neighborhood tabulation areas (in miles),CleanDistances
+dist_midtown,Distance to the centroid of the Midtown-Midtown South neighborhood tabulation areas (in miles),CleanDistances
 gentrify,,
 GEOID,,
 grad_rate,,

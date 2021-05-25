@@ -31,7 +31,7 @@ ltdb_data = read_csv("CleanData/LTDB_clean.csv", col_types = cols(GEOID = col_ch
 wac_data = read_csv("CleanData/WAC_clean.csv", col_types = cols(GEOID = col_character()))
 ##New York City open data
 crime_counts = read_csv("CleanData/crime_counts.csv", col_types = cols(GEOID = col_character()))
-dist_cbds = read_csv("CleanData/distance_cbds.csv", col_types = cols(GEOID = col_character()))
+dist_data = read_csv("CleanData/distance_data.csv", col_types = cols(GEOID = col_character()))
 lane_counts = read_csv("CleanData/lane_counts.csv", col_types = cols(GEOID = col_character()))
 park_counts = read_csv("CleanData/park_counts.csv", col_types = cols(GEOID = col_character()))
 permit_density = read_csv("CleanData/permit_density.csv", col_types = cols(GEOID = col_character()))

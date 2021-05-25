@@ -47,9 +47,16 @@ cbds = st_read("RawData/nynta_21b/nynta.shp") %>%
 #Calculate Distances to Midtown and the Financial District
 
 ```{r}
-cbds
+dist_cbds = as.data.frame(clean.units(st_distance(nyc_shp, cbds) / 5280)) %>%
+  rename(dist_downtown = V1, dist_midtown = V2) %>%
+  cbind(GEOID = nyc_shp$GEOID)
 ```
 
+#Write Data
+
+```{r}
+write_csv(dist_cbds, "CleanData/distance_cbds.csv")
+```
 
 
 

@@ -1,92 +1,94 @@
 variable,description,variable creation filename (in Code/Cleaning directory)
-Borough,Borough that census tract is located in,
+Borough,Borough that census tract is located in,NA
 C1_C2,Share of total tract tax lot area that has C1 or C2 (low-density commercial) zoning designation,CleanPluto
 C4,Share of total tract tax lot area that has C4 (medium-density commercial) zoning designation,CleanPluto
-class_a,Number of class A rental conditions violations (least severe) per tract renter population ,CleanViolation
-class_b,Number of class B rental conditions violations (second-most severe) per tract renter population ,CleanViolation
-class_c,Number of class C rental conditions violations (most severe) per tract renter population ,CleanViolation
+class_a,Number of class A rental conditions violations (least severe) per tract renter population,CleanViolation
+class_b,Number of class B rental conditions violations (second-most severe) per tract renter population,CleanViolation
+class_c,Number of class C rental conditions violations (most severe) per tract renter population,CleanViolation
 consensual,"Number of arrests per capita for ""consensual"" crimes (dangerous drugs-related, dangerous weapons-related, prostitution-related)",CleanArrests
 d_permits,Number of permits issued by the department of buildings for new residential construction per square mile (2009-2011 period),CleanPermits
 d_permits_2011,Number of permits issued by the department of buildings for new residential construction per square mile (2011 only),CleanPermits
-d_trees,Number of healthy trees per square mile as of the 2005 census of trees,CleanTrees 
-d_w_administrative,,
-d_w_arts,,
-d_w_asian,,
-d_w_black,,
-d_w_college,,
-d_w_education,,
-d_w_female,,
-d_w_finance,,
-d_w_food,,
-d_w_healthcare,,
-d_w_hispanic,,
-d_w_hs,,
-d_w_information,,
-d_w_lesshs,,
-d_w_male,,
-d_w_management,,
-d_w_manufacturing,,
-d_w_professional,,
-d_w_realestate,,
-d_w_retail,,
-d_w_services,,
-d_w_somecollege,,
-d_w_storage,,
-d_w_total,,
-d_w_trade,,
-d_w_white,,
+d_trees,Number of healthy trees per square mile as of the 2005 census of trees,CleanTrees
+d_w_administrative,NA,NA
+d_w_arts,NA,NA
+d_w_asian,NA,NA
+d_w_black,NA,NA
+d_w_college,NA,NA
+d_w_education,NA,NA
+d_w_female,NA,NA
+d_w_finance,NA,NA
+d_w_food,NA,NA
+d_w_healthcare,NA,NA
+d_w_hispanic,NA,NA
+d_w_hs,NA,NA
+d_w_information,NA,NA
+d_w_lesshs,NA,NA
+d_w_male,NA,NA
+d_w_management,NA,NA
+d_w_manufacturing,NA,NA
+d_w_professional,NA,NA
+d_w_realestate,NA,NA
+d_w_retail,NA,NA
+d_w_services,NA,NA
+d_w_somecollege,NA,NA
+d_w_storage,NA,NA
+d_w_total,NA,NA
+d_w_trade,NA,NA
+d_w_white,NA,NA
 dist_downtown,Distance to the centroid of the Battery Park City-Lower Manhattan neighborhood tabulation areas (in miles),CleanDistances
 dist_midtown,Distance to the centroid of the Midtown-Midtown South neighborhood tabulation areas (in miles),CleanDistances
-gentrify,,
-GEOID,,
-grad_rate,,
-medianhomevalue,,
-medianincome,,
-medianrent,,
-MR,,
-n_lanes,,
-n_lines,,
-n_parks,,
-NTA,,
-p_asian_pop,,
-p_black_pop,,
-p_college_pop,,
-p_hispanic_pop,,
-p_housing_pop,,
-p_hs_pop,,
-p_lesshs_pop,,
-p_poverty_pop,,
-p_renter_pop,,
-p_w_administrative,,
-p_w_arts,,
-p_w_asian,,
-p_w_black,,
-p_w_college,,
-p_w_education,,
-p_w_female,,
-p_w_finance,,
-p_w_food,,
-p_w_healthcare,,
-p_w_hispanic,,
-p_w_hs,,
-p_w_information,,
-p_w_lesshs,,
-p_w_male,,
-p_w_management,,
-p_w_manufacturing,,
-p_w_professional,,
-p_w_realestate,,
-p_w_retail,,
-p_w_services,,
-p_w_somecollege,,
-p_w_storage,,
-p_w_trade,,
-p_w_white,,
-p_white_pop,,
-pop,,
-pre_p_college_pop,,
-property,,
-R1_R5,,
-R6_R10,,
-violent,,
-year,,
+gentrify,NA,NA
+GEOID,NA,NA
+grad_rate,NA,NA
+medianhomevalue,NA,NA
+medianincome,NA,NA
+medianrent,NA,NA
+MR,NA,NA
+n_lanes,NA,NA
+n_lines,NA,NA
+n_parks,NA,NA
+NTA,NA,NA
+p_asian_pop,NA,NA
+p_black_pop,NA,NA
+p_college_pop,NA,NA
+p_hispanic_pop,NA,NA
+p_housing_pop,NA,NA
+p_hs_pop,NA,NA
+p_lesshs_pop,NA,NA
+p_poverty_pop,NA,NA
+p_renter_pop,NA,NA
+p_w_administrative,NA,NA
+p_w_arts,NA,NA
+p_w_asian,NA,NA
+p_w_black,NA,NA
+p_w_college,NA,NA
+p_w_education,NA,NA
+p_w_female,NA,NA
+p_w_finance,NA,NA
+p_w_food,NA,NA
+p_w_healthcare,NA,NA
+p_w_hispanic,NA,NA
+p_w_hs,NA,NA
+p_w_information,NA,NA
+p_w_lesshs,NA,NA
+p_w_male,NA,NA
+p_w_management,NA,NA
+p_w_manufacturing,NA,NA
+p_w_professional,NA,NA
+p_w_realestate,NA,NA
+p_w_retail,NA,NA
+p_w_services,NA,NA
+p_w_somecollege,NA,NA
+p_w_storage,NA,NA
+p_w_trade,NA,NA
+p_w_white,NA,NA
+p_white_pop,NA,NA
+pop,NA,NA
+pre_p_college_pop,NA,NA
+property,NA,NA
+R1_R5,NA,NA
+R6_R10,NA,NA
+violent,NA,NA
+year,NA,NA
+dist_hi,NA,NA
+seg_index,NA,NA

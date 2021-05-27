@@ -19,6 +19,7 @@ library(readr)
 library(readxl)
 library(tidycensus)
 library(tidyverse)
+library(segregation)
 source("Code/Scripts/utils.R")
 ```
 
@@ -26,6 +27,8 @@ source("Code/Scripts/utils.R")
 #Read in data to clean
 acs_raw = read_csv("RawData/ACS_raw.csv", col_types = cols(GEOID = col_character())) 
 ```
+
+#Clean Data and Add Local Segregation Index 
 
 ```{r}
 acs_clean = acs_raw %>%
@@ -38,7 +41,26 @@ acs_clean = acs_raw %>%
   select(-(ends_with("_pop") & !starts_with("p_"))) #Drop raw population counts
 ```
 
-#Write Clean ACS Data
+```{r}
+segregation_input = acs_clean %>% 
+  filter(year == 2011) %>%
+  mutate(white = p_white_pop * pop, black = p_black_pop*pop) %>%
+  select(GEOID, white, black) %>%
+  gather(key = "race", value = "pop", -GEOID)
+```
+
+```{r}
+segregation_data = mutual_local(segregation_input, group = "race", unit = "GEOID", weight = "pop",
+             se = FALSE, wide = TRUE) %>%
+  select(-p) %>%
+  rename(seg_index = ls)
+```
+
+#oin and Write Clean ACS Data
+
+```{r}
+acs_clean = inner_join(acs_clean, segregation_data, by = "GEOID")
+```
 
 ```{r}
 write_csv(acs_clean, "CleanData/ACS_clean.csv")

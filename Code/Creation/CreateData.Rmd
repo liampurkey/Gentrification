@@ -74,7 +74,7 @@ dd_data = wac_data %>%
   inner_join(gen_data, by = "GEOID") %>%
   inner_join(acs_data %>% filter(year == 2011) %>% select(-year), by = "GEOID") %>%
   inner_join(crime_counts, by = "GEOID") %>%
-  inner_join(dist_cbds, by = "GEOID") %>%
+  inner_join(dist_data, by = "GEOID") %>%
   inner_join(lane_counts, by = "GEOID") %>%
   inner_join(park_counts, by = "GEOID") %>%
   inner_join(permit_density, by = "GEOID") %>%
@@ -82,6 +82,10 @@ dd_data = wac_data %>%
   inner_join(subway_counts, by = "GEOID") %>%
   inner_join(tree_density, by = "GEOID") %>%
   inner_join(violations, by = "GEOID") 
+```
+
+```{r}
+names(dd_data)
 ```
 
 ##Create Event Study Data
